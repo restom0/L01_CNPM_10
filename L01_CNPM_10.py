@@ -5,9 +5,12 @@ from  Adafruit_IO import  MQTTClient
 import serial.tools.list_ports
 import pymongo
 import datetime
-AIO_FEED_IDS = ["cambienanhsang","cambiendoamdat","cambiennhietdo","cambiendoam","maybom1","maybom2"]
-AIO_USERNAME = "restom0"
-AIO_KEY = "aio_QZUs55YJLWoa9pZn68Fuplbw1fIt"
+from dotenv import dotenv_values
+
+config = dotenv_values(".env")
+AIO_FEED_IDS=config.get("AIO_FEED_IDS").split(",")
+AIO_USERNAME=config.get("AIO_USERNAME")
+AIO_KEY=config.get("AIO_KEY")
 myclient = pymongo.MongoClient("mongodb+srv://L01_CNPM_10:zREWlyXoHAtT6U3k@cluster0.mpdyonk.mongodb.net/")
 mydb = myclient["CMS"]
 mycol = mydb["Users"]
