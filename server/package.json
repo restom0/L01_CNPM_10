@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ./src/server.js",
+    "start": "nodemon ./server.js",
     "lint": "eslint . --ext .js",
     "beautiful": "prettier --single-quote --trailing-comma all --semi false --write 'src/**/*.{js,json,scss}'"
   },
@@ -15,6 +16,7 @@
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^6.18.1",
     "@typescript-eslint/parser": "^6.18.1",
+    "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

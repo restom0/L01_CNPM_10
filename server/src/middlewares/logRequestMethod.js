@@ -1,4 +1,4 @@
-const logRequestMethod = (req, res, next) => {
+export const logRequestMethod = (req, res, next) => {
   const method = req.method
   const path = req.path
 
@@ -8,5 +8,3 @@ const logRequestMethod = (req, res, next) => {
 
   next()
 }
-
-module.exports = logRequestMethod
