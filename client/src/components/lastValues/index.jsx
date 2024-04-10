@@ -64,10 +64,10 @@ export default function LastValues() {
                 const tempResponse = await axios.get(`http://localhost:3001/sensors/temp`, config);
                 const lightResponse = await axios.get(`http://localhost:3001/sensors/light`, config);
                 const humidResponse = await axios.get(`http://localhost:3001/sensors/humid`, config);
-                // const moistureResponse = await axios.get(`http://localhost:3001/sensors/moisture`, config);
+                const moistureResponse = await axios.get(`http://localhost:3001/sensors/moisture`, config);
                 setTempInfo(
                     {
-                        value: tempResponse.data.data.value,
+                        value: parseFloat(tempResponse.data.data.value),
                         time: formatTime(tempResponse.data.data.created_at),
                         // lowerThreshold: tempResponse.data.lower,
                         // upperThreshold: tempResponse.data.upper,
@@ -78,7 +78,7 @@ export default function LastValues() {
                 );
                 setLightInfo(
                     {
-                        value: lightResponse.data.data.value,
+                        value: parseFloat(lightResponse.data.data.value),
                         valuePercent: lightResponse.data.data.value * 100 / 10000,
                         time: formatTime(lightResponse.data.data.created_at),
                         // lowerThreshold: lightResponse.data.lower,
@@ -94,7 +94,7 @@ export default function LastValues() {
                 );
                 setHumidInfo(
                     {
-                        value: humidResponse.data.data.value,
+                        value: parseFloat(humidResponse.data.data.value),
                         time: formatTime(humidResponse.data.data.created_at),
                         // lowerThreshold: humidResponse.data.lower,
                         // upperThreshold: humidResponse.data.upper,
@@ -103,17 +103,19 @@ export default function LastValues() {
                         condition: humidResponse.data.data.value >= 40 && humidResponse.data.data.value <= 70
                     }
                 );
-                // setMoistureInfo(
-                //     {
-                //         value: moistureResponse.data.data.value,
-                //         time: formatTime(moistureResponse.data.data.created_at),
-                //         // lowerThreshold: moistureResponse.data.lower,
-                //         // upperThreshold: moistureResponse.data.upper,
-                //         lowerThreshold: 60,
-                //         upperThreshold: 70,
-                //         condition: moistureResponse.data.data.value >= 60 && moistureResponse.data.data.value <= 70
-                //     }
-                // );
+                console.log(moistureResponse.data.data.value)
+                console.log(0.0)
+                setMoistureInfo(
+                    {
+                        value: parseFloat(moistureResponse.data.data.value),
+                        time: formatTime(moistureResponse.data.data.created_at),
+                        // lowerThreshold: moistureResponse.data.lower,
+                        // upperThreshold: moistureResponse.data.upper,
+                        lowerThreshold: 60,
+                        upperThreshold: 70,
+                        condition: moistureResponse.data.data.value >= 60 && moistureResponse.data.data.value <= 70
+                    }
+                );
                 setLoading(false); // Set loading to false after data is fetched
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -356,7 +358,6 @@ export default function LastValues() {
                             <div className='w-[300px] h-[300px] mx-auto mt-2'>
                                 <div className='flex flex-col justify-center items-center'>
                                     <div className='relative inline-flex'>
-                                        
                                         <CircularProgress
                                             variant='determinate' value={(humidInfo.value < humidInfo.lowerThreshold) ? humidInfo.value : humidInfo.lowerThreshold - 0.1}
                                             size={250}
@@ -457,10 +458,10 @@ export default function LastValues() {
                                 </div>
                                 <div name='subtitle'>Lấy từ cảm biến độ ẩm đất</div>
                             </div>
-                            {/* <div className='w-[300px] h-[300px] mx-auto mt-2'>
+                            <div className='w-[300px] h-[300px] mx-auto mt-2'>
                                 <div className='flex flex-col justify-center items-center'>
                                     <div className='relative inline-flex'>
-                                        <CircularProgress
+                                    <CircularProgress
                                             variant='determinate' value={(moistureInfo.value < moistureInfo.lowerThreshold) ? moistureInfo.value : moistureInfo.lowerThreshold - 0.1}
                                             size={250}
                                             thickness={3}
@@ -551,7 +552,7 @@ export default function LastValues() {
                                     </div>
                                     <div className='clear-both'></div>
                                 </div>
-                            </div> */}
+                            </div>
                         </div>
                     </div>
                 </div>

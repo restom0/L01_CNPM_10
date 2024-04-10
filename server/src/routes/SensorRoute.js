@@ -5,7 +5,7 @@ const SensorRouter = express.Router()
 SensorRouter.get('/humid', SensorController.getHumidityThreshold, SensorController.getLastHumidityValue)
 SensorRouter.get('/light', SensorController.getLightThreshold, SensorController.getLastLightValue)
 SensorRouter.get('/temp', SensorController.getTemperatureThreshold, SensorController.getLastTemperatureValue)
-SensorRouter.get('/moisture', SensorController.getLastMoistureValue, SensorController.getLastMoistureValue)
+SensorRouter.get('/moisture', SensorController.getMoistureThreshold, SensorController.getLastMoistureValue)
 
 SensorRouter.get('/chart/humid', SensorController.getAllHumidityValue)
 SensorRouter.get('/chart/light', SensorController.getAllLightValue)
