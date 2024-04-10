@@ -1,6 +1,7 @@
 import express, { json } from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
+import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser'
 import rateLimit from 'express-rate-limit'
 // import { createServer } from 'node:http'
@@ -15,10 +16,13 @@ import { logRequestTime } from './src/middlewares/logRequestTime.js'
 import { logRequestMethod } from './src/middlewares/logRequestMethod.js'
 import { DATABASE_CONFIG } from './src/configs/database.js'
 import { requireApiKey } from './src/middlewares/useApiKey.js'
+
 const app = express()
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 // const server = createServer(app)
 // const io = new Server(server)
-const port = 3000
+const port = 3001
 app.use(
   cors({
     methods: ['get', 'post', 'put', 'DELETE', 'PATCH'],
@@ -91,8 +95,8 @@ async function start() {
     await mongoose.connect(DB_CONNECTION_STR)
     console.log('Connect success')
 
-    app.listen(3000, () => {
-      console.log(`Listening at port ${3000}`)
+    app.listen(port, () => {
+      console.log(`Listening at port ${port}`)
     })
   } catch (error) {
     console.log('Error connect to database with error: ' + error.message)
