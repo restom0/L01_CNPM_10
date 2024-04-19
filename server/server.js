@@ -25,7 +25,7 @@ app.use(bodyParser.json());
 const port = 3001
 app.use(
   cors({
-    methods: ['get', 'post', 'put', 'DELETE', 'PATCH'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true
   })
 )

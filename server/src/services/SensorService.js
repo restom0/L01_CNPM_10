@@ -1,6 +1,7 @@
 import { HumidityModel } from '../models/HumiditySensors.js'
 import { LightModel } from '../models/LightSensors.js'
 import { TemperatureModel } from '../models/TemperatureSensors.js'
+import { MoistureModel } from '../models/MoistureSensors.js'
 import axios from 'axios'
 import { CommonUtils } from '../utils/common.js'
 import { SensorModel } from '../models/Sensors.js'
@@ -17,7 +18,7 @@ const getAllTemperatureValue = async (id) => {
 }
 
 const getAllMoistureValue = async (id) => {
-  return await TemperatureModel.find({ userId: id })
+  return await MoistureModel.find({ userId: id })
 }
 
 const getLastHumidityValue = async (mqtt, id) => {
