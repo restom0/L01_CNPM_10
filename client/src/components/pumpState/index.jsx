@@ -4,11 +4,11 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 
-export default function PumpState() {
+export default function PumpState(props) {
     const [pumpState, setPumpState] = useState(false);
     const [loading, setLoading] = useState(true);
     // const sessionID = document.cookie.split('; ').find((cookie) => cookie.startsWith(`sessionID=`)).split('=')[1]
-    const sessionID = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTI3ODgzMTksImRhdGEiOiI2NjEzOTA2NDNhMzE5ZmViZGMxNzQxNDIiLCJpYXQiOjE3MTI3NTk1MTl9.p8mgMIWO4b3RHh8zewZU9KOZ_EXnw2MzKVCI1wBJ5cs";
+    const [sessionID, setSessionID] = useState(props.api_token);
     useEffect(() => {
         const fetchApiData = async () => {
             try {
@@ -19,7 +19,7 @@ export default function PumpState() {
                 };
                 const pumpResponse = await axios.get(`http://localhost:3001/waterpumps`, config);
                 setPumpState((pumpResponse.data.data.value == "OFF") ? false : true)
-                setLoading(false); // Set loading to false after data is fetched
+                setLoading(false);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -27,7 +27,7 @@ export default function PumpState() {
     
         fetchApiData();
 
-        const intervalId = setInterval(fetchApiData, 5 * 1000);
+        const intervalId = setInterval(fetchApiData, 10 * 1000);
 
         return () => clearInterval(intervalId);
     }, []);
