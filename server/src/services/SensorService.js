@@ -6,23 +6,24 @@ import axios from 'axios'
 import { CommonUtils } from '../utils/common.js'
 import { SensorModel } from '../models/Sensors.js'
 const getAllHumidityValue = async (id) => {
-  return await HumidityModel.find({ userId: id })
+  console.log(id)
+  return await HumidityModel.find({ userID: id })
 }
 
 const getAllLightValue = async (id) => {
-  return await LightModel.find({ userId: id })
+  return await LightModel.find({ userID: id })
 }
 
 const getAllTemperatureValue = async (id) => {
-  return await TemperatureModel.find({ userId: id })
+  return await TemperatureModel.find({ userID: id })
 }
 
 const getAllMoistureValue = async (id) => {
-  return await MoistureModel.find({ userId: id })
+  return await MoistureModel.find({ userID: id })
 }
 
 const getLastHumidityValue = async (mqtt, id) => {
-  const sensor = await SensorModel.findOne({ userId: id })
+  const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
     throw new Error('Humidity sensor not found')
   }
@@ -33,7 +34,7 @@ const getLastHumidityValue = async (mqtt, id) => {
 }
 
 const getLastLightValue = async (mqtt, id) => {
-  const sensor = await SensorModel.findOne({ userId: id })
+  const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
     throw new Error('Light sensor not found')
   }
@@ -44,7 +45,7 @@ const getLastLightValue = async (mqtt, id) => {
 }
 
 const getLastTemperatureValue = async (mqtt, id) => {
-  const sensor = await SensorModel.findOne({ userId: id })
+  const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
     throw new Error('Temperature sensor not found')
   }
@@ -55,7 +56,7 @@ const getLastTemperatureValue = async (mqtt, id) => {
 }
 
 const getLastMoistureValue = async (mqtt, id) => {
-  const sensor = await SensorModel.findOne({ userId: id })
+  const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
     throw new Error('Moisture sensor not found')
   }
@@ -66,7 +67,7 @@ const getLastMoistureValue = async (mqtt, id) => {
 }
 
 const getLightThreshold = async (id) => {
-  const sensor = await SensorModel.findOne({ userId: id })
+  const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
     throw new Error('Light sensor not found')
   }
@@ -75,7 +76,7 @@ const getLightThreshold = async (id) => {
 
 const updateLightThreshold = async (id, upper, lower) => {
   const sensor = await SensorModel.findOneAndUpdate(
-    { userId: id },
+    { userID: id },
     { upperLightThreshold: upper, lowerLightThreshold: lower }
   )
   if (CommonUtils.checkNullOrUndefined(sensor)) {
@@ -84,7 +85,7 @@ const updateLightThreshold = async (id, upper, lower) => {
 }
 
 const getTemperatureThreshold = async (id) => {
-  const sensor = await SensorModel.findOne({ userId: id })
+  const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
     throw new Error('Temperature sensor not found')
   }
@@ -93,7 +94,7 @@ const getTemperatureThreshold = async (id) => {
 
 const updateTemperatureThreshold = async (id, upper, lower) => {
   const sensor = await SensorModel.findOneAndUpdate(
-    { userId: id },
+    { userID: id },
     { upperTemperatureThreshold: upper, lowerTemperatureThreshold: lower }
   )
   if (CommonUtils.checkNullOrUndefined(sensor)) {
@@ -102,7 +103,7 @@ const updateTemperatureThreshold = async (id, upper, lower) => {
 }
 
 const getHumidityThreshold = async (id) => {
-  const sensor = await SensorModel.findOne({ userId: id })
+  const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
     throw new Error('Humidity sensor not found')
   }
@@ -111,7 +112,7 @@ const getHumidityThreshold = async (id) => {
 
 const updateHumidityThreshold = async (id, upper, lower) => {
   const sensor = await SensorModel.findOneAndUpdate(
-    { userId: id },
+    { userID: id },
     { upperHumidityThreshold: upper, lowerHumidityThreshold: lower }
   )
   if (CommonUtils.checkNullOrUndefined(sensor)) {
@@ -120,7 +121,7 @@ const updateHumidityThreshold = async (id, upper, lower) => {
 }
 
 const getMoistureThreshold = async (id) => {
-  const sensor = await SensorModel.findOne({ userId: id })
+  const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
     throw new Error('Moisture sensor not found')
   }
@@ -129,7 +130,7 @@ const getMoistureThreshold = async (id) => {
 
 const updateMoistureThreshold = async (id, upper, lower) => {
   const sensor = await SensorModel.findOneAndUpdate(
-    { userId: id },
+    { userID: id },
     { upperMoistureThreshold: upper, lowerMoistureThreshold: lower }
   )
   if (CommonUtils.checkNullOrUndefined(sensor)) {
