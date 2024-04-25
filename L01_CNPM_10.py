@@ -30,20 +30,20 @@ def  disconnected(client):
 def  message(client , feed_id , payload):
     print("Nhận dữ liệu: " + payload +" ở thiết bị "+feed_id)
     if feed_id=="cambienanhsang":
-        mydb["LightSensors"].insert_one({"userID":mydoc['_id'],"data":float(payload),"Date":datetime.datetime.now()})
-        mydb["Logs"].insert_one({"userID":mydoc['_id'],"activity":("Nhập dữ liệu "+ payload +" vào LightSensors"),"Date":datetime.datetime.now()})
+        mydb["lightsensors"].insert_one({"userID":mydoc['_id'],"data":float(payload),"Date":datetime.datetime.now()})
+        mydb["logs"].insert_one({"userID":mydoc['_id'],"activity":("Nhập dữ liệu "+ payload +" vào lightsensors"),"Date":datetime.datetime.now()})
     if feed_id=="cambiendoamdat":
-        mydb["MoistureSensors"].insert_one({"userID":mydoc['_id'],"data":float(payload),"Date":datetime.datetime.now()})
-        mydb["Logs"].insert_one({"userID":mydoc['_id'],"activity":("Nhập dữ liệu "+ payload +" vào MoistureSensors"),"Date":datetime.datetime.now()})
+        mydb["moisturesensors"].insert_one({"userID":mydoc['_id'],"data":float(payload),"Date":datetime.datetime.now()})
+        mydb["logs"].insert_one({"userID":mydoc['_id'],"activity":("Nhập dữ liệu "+ payload +" vào moisturesensors"),"Date":datetime.datetime.now()})
     if feed_id=="cambiennhietdo":
-        mydb["TemperatureSensors"].insert_one({"userID":mydoc['_id'],"data":float(payload),"Date":datetime.datetime.now()})
-        mydb["Logs"].insert_one({"userID":mydoc['_id'],"activity":("Nhập dữ liệu "+ payload +" vào TemperatureSensors"),"Date":datetime.datetime.now()})
+        mydb["temperaturesensors"].insert_one({"userID":mydoc['_id'],"data":float(payload),"Date":datetime.datetime.now()})
+        mydb["logs"].insert_one({"userID":mydoc['_id'],"activity":("Nhập dữ liệu "+ payload +" vào temperaturesensors"),"Date":datetime.datetime.now()})
     if feed_id=="cambiendoam":
-        mydb["HumiditySensors"].insert_one({"userID":mydoc['_id'],"data":float(payload),"Date":datetime.datetime.now()})
-        mydb["Logs"].insert_one({"userID":mydoc['_id'],"activity":("Nhập dữ liệu "+ payload +" vào HumiditySensors"),"Date":datetime.datetime.now()})
+        mydb["humiditysensors"].insert_one({"userID":mydoc['_id'],"data":float(payload),"Date":datetime.datetime.now()})
+        mydb["logs"].insert_one({"userID":mydoc['_id'],"activity":("Nhập dữ liệu "+ payload +" vào humiditysensors"),"Date":datetime.datetime.now()})
     if feed_id=="maybom1":
-        mydb["WaterPumps"].insert_one({"userID":mydoc['_id'],"data":payload,"Date":datetime.datetime.now()})
-        mydb["Logs"].insert_one({"userID":mydoc['_id'],"activity":("Nhập dữ liệu "+ payload +" vào WaterPumps"),"Date":datetime.datetime.now()})
+        mydb["waterpumps"].insert_one({"userID":mydoc['_id'],"data":payload,"Date":datetime.datetime.now()})
+        mydb["logs"].insert_one({"userID":mydoc['_id'],"activity":("Nhập dữ liệu "+ payload +" vào waterpumps"),"Date":datetime.datetime.now()})
     if isMicrobitConnected:
         ser.write((str(payload) + "#").encode())
 
