@@ -24,7 +24,7 @@ const getLastWaterPumpValue = async (req, res, next) => {
       data: result
     })
   } catch (error) {
-    res.status(error.respose.status).json({ error: error.message })
+    res.status(error.statusCode).json({ error: error.message })
   }
 }
 export const WaterPumpController = { automaticWatering, turnOnPump, turnOffPump, getLastWaterPumpValue }

@@ -5,7 +5,7 @@ import { NotFoundError } from '../errors/notFound.error.js'
 
 const automaticWatering = async (id, starttime, endtime) => {}
 const turnOnPump = async (key, mqtt, id) => {
-  const sensor = await SensorModel.findOne({ userId: id })
+  const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
     throw new NotFoundError('Water Pump not found')
   }
@@ -22,7 +22,7 @@ const turnOnPump = async (key, mqtt, id) => {
   )
 }
 const turnOffPump = async (key, mqtt, id) => {
-  const sensor = await SensorModel.findOne({ userId: id })
+  const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
     throw new NotFoundError('Water Pump sensor not found')
   }
@@ -39,7 +39,7 @@ const turnOffPump = async (key, mqtt, id) => {
   )
 }
 const getLastWaterPumpValue = async (mqtt, id) => {
-  const sensor = await SensorModel.findOne({ userId: id })
+  const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
     throw new Error('Light sensor not found')
   }
