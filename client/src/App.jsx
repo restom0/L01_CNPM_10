@@ -7,6 +7,7 @@ import Setting from "./pages/setting";
 import Login from "./pages/login";
 import Signup from "./pages/signup";
 import Log from "./pages/log";
+import User from "./pages/user";
 
 function App() {
   return (
@@ -17,8 +18,9 @@ function App() {
         <Route path="/" element={<LayoutAdmin />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="chart" element={<Chart />} />
-          <Route path="log" element={<Log />} />
           <Route path="setting" element={<Setting />} />
+          <Route path="log" element={<Log />} />
+          <Route path="user" element={<User />} />
         </Route>
       </Routes>
     </Router>

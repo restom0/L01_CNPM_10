@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import loginBackground from '../../assets/images/login_background.png';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import Cookies from 'universal-cookie';
-import axios from 'axios';
-import History from '../../components/history'
+import { useNavigate } from 'react-router-dom';
 
 const cookies = new Cookies();
-
-export default function Log() {
+export default function User() {
 	const [sessionID, setSessionID] = useState('');
 	const [loading, setLoading] = useState(true);
 	const navigate = useNavigate();
@@ -30,11 +26,10 @@ export default function Log() {
 	return (
 		<div>
 			{loading ? (
-                <div></div>
-                ) : (
-                <div>
-                    <History api_token={sessionID}/>
-                </div>
+				<div></div>
+				) : (
+				<div>
+				</div>		
 			)}
 		</div>
 	);      

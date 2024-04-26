@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import LastValues from '../../components/lastValues';
@@ -33,11 +32,11 @@ export default function Dashboard() {
                 <div></div>
                 ) : (
 					<div className='lg:flex md:block w-full h-[1000px] gap-[20px]'>
-					{/* <LastValues api_token={sessionID}/> */}
+					<LastValues api_token={sessionID}/>
 					<div>
 					<PumpInfo api_token={sessionID}/>
 					<br></br>
-					{/* <History api_token={sessionID}/> */}
+					<History api_token={sessionID}/>
 					</div>
 				</div>		
 			)}
