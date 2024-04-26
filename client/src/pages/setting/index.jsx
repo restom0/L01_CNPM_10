@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import LastValues from '../../components/lastValues';
+import Cookies from 'universal-cookie';
+import { useNavigate } from 'react-router-dom';
 import PumpInfo from '../../components/pumpInfo'
 
 export default function Setting() {
