@@ -8,7 +8,14 @@ const register = (username, password, mqttUsername, aioKey) => {
   if (UserModel.findOne({ username })) {
     throw new BadRequestError('Account existed')
   }
-  UserModel.create()
+  const user = new UserModel({
+    _id: new Types.ObjectId(),
+    username,
+    password,
+    mqttUsername,
+    aioKey
+  })
+  return user.save()
 }
 const authorize = async (id) => {
   id = Types.ObjectId.createFromHexString(id)
