@@ -3,9 +3,9 @@ const ObjectId = Schema.ObjectId
 
 const TemperatureSensor = new Schema({
   _id: ObjectId,
-  userId: { type: ObjectId, ref: 'Users', required: true },
+  userID: { type: ObjectId, ref: 'Users', required: true },
   data: { type: Number, required: true },
-  date: { type: Date, required: true }
+  Date: { type: Date, required: true }
 })
 const TemperatureModel = mongoose.model('TemperatureSensors', TemperatureSensor)
 

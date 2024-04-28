@@ -6,7 +6,7 @@ const getDataOnDate = async (req, res, next) => {
     const data = await LogService.getDataOnDate(date, req.user.id)
     res.json(data)
   } catch (error) {
-    next(error)
+    res.status(error.statusCode).json({ error: error.message })
   }
 }
 

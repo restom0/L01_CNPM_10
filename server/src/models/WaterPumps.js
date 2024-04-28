@@ -3,12 +3,9 @@ const ObjectId = Schema.ObjectId
 
 const WaterPump = new Schema({
   _id: ObjectId,
-  userId: { type: ObjectId, ref: 'Users', required: true },
+  userID: { type: ObjectId, ref: 'Users', required: true },
   data: { type: String, required: true },
-  date: { type: Date, required: true },
-  mode: { type: Date, required: true },
-  starttime: Date,
-  endtime: Date
+  Date: { type: Date, required: true }
 })
 const WaterPumpModel = mongoose.model('WaterPumps', WaterPump)
 

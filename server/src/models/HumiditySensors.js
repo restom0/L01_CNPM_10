@@ -3,9 +3,9 @@ const ObjectId = Schema.ObjectId
 
 const HumiditySensor = new Schema({
   _id: ObjectId,
-  userId: { type: ObjectId, ref: 'Users', required: true },
+  userID: { type: ObjectId, ref: 'Users', required: true },
   data: { type: Number, required: true },
-  date: { type: Date, required: true }
+  Date: { type: Date, required: true }
 })
 const HumidityModel = mongoose.model('HumiditySensors', HumiditySensor)
 

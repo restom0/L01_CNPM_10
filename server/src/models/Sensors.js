@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose'
 const ObjectId = Schema.ObjectId
 const Sensor = new Schema({
   _id: ObjectId,
-  userId: { type: ObjectId, ref: 'Users', required: true },
+  userID: { type: ObjectId, ref: 'Users', required: true },
   upperLightThreshold: Number,
   lowerLightThreshold: Number,
   upperHumidityThreshold: Number,

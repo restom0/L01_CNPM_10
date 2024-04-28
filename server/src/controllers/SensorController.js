@@ -8,7 +8,7 @@ const getAllHumidityValue = async (req, res, next) => {
     const result = await SensorService.getAllHumidityValue(req.user.id)
     res.status(200).json({ data: result })
   } catch (error) {
-    res.status(400).json({ error: error.message })
+    res.status(error.statusCode).json({ error: error.message })
   }
 }
 
@@ -17,7 +17,7 @@ const getAllLightValue = async (req, res, next) => {
     const result = await SensorService.getAllLightValue(req.user.id)
     res.status(200).json({ data: result })
   } catch (error) {
-    res.status(400).json({ error: error.message })
+    res.status(error.statusCode).json({ error: error.message })
   }
 }
 
@@ -26,7 +26,7 @@ const getAllTemperatureValue = async (req, res, next) => {
     const result = await SensorService.getAllTemperatureValue(req.user.id)
     res.status(200).json({ data: result })
   } catch (error) {
-    res.status(400).json({ error: error.message })
+    res.status(error.statusCode).json({ error: error.message })
   }
 }
 
@@ -35,7 +35,7 @@ const getAllMoistureValue = async (req, res, next) => {
     const result = await SensorService.getAllMoistureValue(req.user.id)
     res.status(200).json({ data: result })
   } catch (error) {
-    res.status(400).json({ error: error.message })
+    res.status(error.statusCode).json({ error: error.message })
   }
 }
 
@@ -49,7 +49,7 @@ const getLastHumidityValue = async (req, res, next) => {
       data: result
     })
   } catch (error) {
-    res.status(400).json({ error: error.message })
+    res.status(error.statusCode).json({ error: error.message })
   }
 }
 
@@ -63,7 +63,7 @@ const getLastLightValue = async (req, res, next) => {
       data: result
     })
   } catch (error) {
-    res.status(400).json({ error: error.message })
+    res.status(error.statusCode).json({ error: error.message })
   }
 }
 
@@ -80,7 +80,7 @@ const getLastTemperatureValue = async (req, res, next) => {
       data: result
     })
   } catch (error) {
-    res.status(400).json({ error: error.message })
+    res.status(error.statusCode).json({ error: error.message })
   }
 }
 
@@ -94,7 +94,7 @@ const getLastMoistureValue = async (req, res, next) => {
       data: result
     })
   } catch (error) {
-    res.status(400).json({ error: error.message })
+    res.status(error.statusCode).json({ error: error.message })
   }
 }
 
@@ -104,7 +104,7 @@ const getLightThreshold = async (req, res, next) => {
     res.threshold = { upper: result.upper, lower: result.lower }
     next()
   } catch (error) {
-    res.status(400).json({ error: error.message })
+    res.status(error.statusCode).json({ error: error.message })
   }
 }
 
@@ -135,7 +135,7 @@ const getTemperatureThreshold = async (req, res, next) => {
     res.threshold = { upper: result.upper, lower: result.lower }
     next()
   } catch (error) {
-    res.status(400).json({ error: error.message })
+    res.status(error.statusCode).json({ error: error.message })
   }
 }
 
@@ -166,7 +166,7 @@ const getHumidityThreshold = async (req, res, next) => {
     res.threshold = { upper: result.upper, lower: result.lower }
     next()
   } catch (error) {
-    res.status(400).json({ error: error.message })
+    res.status(error.statusCode).json({ error: error.message })
   }
 }
 
@@ -197,7 +197,7 @@ const getMoistureThreshold = async (req, res, next) => {
     res.threshold = { upper: result.upper, lower: result.lower }
     next()
   } catch (error) {
-    res.status(400).json({ error: error.message })
+    res.status(error.statusCode).json({ error: error.message })
   }
 }
 
