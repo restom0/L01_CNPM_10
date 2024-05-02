@@ -12,8 +12,8 @@ const register = async (username, password, mqttUsername, aioKey) => {
     _id: new Types.ObjectId(),
     username,
     password,
-    mqttUsername,
-    aioKey
+    mqttusername: mqttUsername,
+    AIO_Key: aioKey
   })
   return await user.save()
 }

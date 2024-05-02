@@ -37,6 +37,7 @@ const register = async (req, res, next) => {
     await UserService.register(username, password, mqttUsername, aioKey)
     res.status(200).json({ data: 'Register successfully' })
   } catch (error) {
+    console.log(error)
     res.status(error.statusCode).json({ error: error.message })
   }
 }
