@@ -4,8 +4,8 @@ import { Types } from 'mongoose'
 const login = async (inputUserName, inputPassword) => {
   return await UserModel.findOne({ username: inputUserName, password: inputPassword }).exec()
 }
-const register = (username, password, mqttUsername, aioKey) => {
-  if (UserModel.findOne({ username })) {
+const register = async (username, password, mqttUsername, aioKey) => {
+  if (await UserModel.findOne({ username })) {
     throw new BadRequestError('Account existed')
   }
   const user = new UserModel({
@@ -15,7 +15,7 @@ const register = (username, password, mqttUsername, aioKey) => {
     mqttUsername,
     aioKey
   })
-  return user.save()
+  return await user.save()
 }
 const authorize = async (id) => {
   id = Types.ObjectId.createFromHexString(id)

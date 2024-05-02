@@ -63,6 +63,9 @@ const getLastMoistureValue = async (mqtt, id) => {
   const result = await axios.get(
     'https://io.adafruit.com/api/v2/' + mqtt + '/feeds/' + sensor.moistureFeedName + '/data?limit=1'
   )
+  if (result.status !== 200) {
+    
+  }
   return { value: result.data[0].value, created_at: result.data[0].created_at }
 }
 

@@ -2,13 +2,14 @@ import { LogModel } from '../models/Logs.js'
 
 const getDataOnDate = async (date, id) => {
   const start = new Date(date)
-  start.setDate(start.getDate() + 1)
-  start.setHours(0, 0, 0, 0)
+  start.setUTCDate(start.getUTCDate())
+  start.setUTCHours(0, 0, 0, 0)
   const end = new Date(date)
-  end.setHours(23, 59, 59, 999)
+  end.setUTCHours(23, 59, 59, 999)
+  console.log(new Date(date), start, end)
   return await LogModel.find({
     userID: id,
-    date: {
+    Date: {
       $gte: start,
       $lte: end
     }
