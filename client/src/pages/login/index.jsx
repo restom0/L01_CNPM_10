@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import loginBackground from '../../assets/images/login_background.png';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'universal-cookie';
@@ -13,12 +13,27 @@ export default function Login() {
     expiresDate.setDate(expiresDate.getDate() + 3);
     const handleLogin = async () => { 
         try {
-            const loginResponse = await axios.post(`http://localhost:3001/login`,{username: username,password: password});
-            cookies.set('sessionID', loginResponse.data.api_token, { expires: expiresDate });
-            navigate('/dashboard');
+            if (username==''){
+                alert("Username không được để trống!")
+            }
+            else if (password==''){
+                alert("Password không được để trống!")
+            }
+            else {
+                const loginResponse = await axios.post(`http://localhost:3001/login`,{username: username,password: password});
+                cookies.set('sessionID', loginResponse.data.api_token, { expires: expiresDate });
+                navigate('/dashboard');
+            }
         }catch (error) {
-            console.error("Error fetching data:", error);
-            alert('Sai tài khoản hoặc mật khẩu!');
+            if (error.response.status == 400) {
+                alert('400: Bad request');
+            }
+            else if (error.response.data.error=='Username or password is incorrect'){
+                alert("Username hoặc Password không đúng!")
+            }
+            else {
+                alert(error.response.data.error);
+            }
         }
     };
     const navigate = useNavigate();

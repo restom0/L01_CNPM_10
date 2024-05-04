@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,9 +27,14 @@ export default function User() {
 	return (
 		<div>
 			{loading ? (
-				<div></div>
-				) : (
-				<div>
+                <div></div>
+                ) : (
+				<div className='lg:flex md:block w-full h-[1000px] gap-[20px]'>
+					<div className="bg-white w-[400px] h-[200px] p-10">
+						<p className="text-lg font-semibold pb-2">Tài khoản: abc</p>
+						<p className="text-lg font-semibold pb-2">Mật khẩu: abc</p>
+						<p className="text-lg font-semibold pb-2">Tài khoản Adafruit: abc</p>
+					</div>		
 				</div>		
 			)}
 		</div>
