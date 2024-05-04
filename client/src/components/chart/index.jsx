@@ -58,10 +58,20 @@ export default function Charts(props) {
                 ));
                 setMoistureLoading(false);
             } catch (error) {
-                console.error('Error fetching data:', error);
+                if (error.response.status == 403 || error.response.status == 401) {
+                    alert('Error: ' + error.response.data.message);
+                    navigate('/login');
+                }
+                else {
+                    alert('Error: ' + error.response.data.error);
+                    console.error("Error fetching data:", error);
+                }
             }
         };
         fetchData();
+        const intervalId = setInterval(fetchApiData, 10 * 1000);
+
+        return () => clearInterval(intervalId);
     }, []);
 
     return (

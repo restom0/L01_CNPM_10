@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import {CircularProgress, TextField} from '@mui/material';
 import TemperatureCelsiusGood from '../../assets/images/temperature-celsius-good.svg';
 import TemperatureCelsiusWarning from '../../assets/images/temperature-celsius-warning.svg';
@@ -11,26 +12,27 @@ import AirHumidityWarning from '../../assets/images/air-humidity-warning.svg';
 import AirHumidityGood from '../../assets/images/air-humidity-good.svg';
 
 function formatDateInfo(inputTime) {
-    const date = new Date(inputTime);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
+    // const date = new Date(inputTime);
+    // const today = new Date();
+    // const yesterday = new Date(today);
+    // yesterday.setDate(yesterday.getDate() - 1);
 
-    const isToday = date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
-    const isYesterday = date.getDate() === yesterday.getDate() && date.getMonth() === yesterday.getMonth() && date.getFullYear() === yesterday.getFullYear();
+    // const isToday = date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+    // const isYesterday = date.getDate() === yesterday.getDate() && date.getMonth() === yesterday.getMonth() && date.getFullYear() === yesterday.getFullYear();
 
-    if (isToday) {
-        return `Hôm nay lúc ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-    } else if (isYesterday) {
-        return `Hôm qua lúc ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-    } else {
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        return `${day}/${month}/${year} lúc ${hours}:${minutes}`;
-    }
+    // if (isToday) {
+    //     return `Hôm nay lúc ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+    // } else if (isYesterday) {
+    //     return `Hôm qua lúc ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+    // } else {
+    //     const day = date.getDate().toString().padStart(2, '0');
+    //     const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    //     const year = date.getFullYear();
+    //     const hours = date.getHours().toString().padStart(2, '0');
+    //     const minutes = date.getMinutes().toString().padStart(2, '0');
+    //     return `${day}/${month}/${year} lúc ${hours}:${minutes}`;
+    // }
+    return inputTime;
 }
 
 function formatTime(inputTime) {
@@ -54,7 +56,7 @@ export default function LastValues(props) {
     const [lightLoading, setLightLoading] = useState(true);
     const [humidLoading, setHumidLoading] = useState(true);
     const [moistureLoading, setMoistureLoading] = useState(true);
-    // const sessionID = document.cookie.split('; ').find((cookie) => cookie.startsWith(`sessionID=`)).split('=')[1]
+    const navigate = useNavigate();
     const [sessionID, setSessionID] = useState(props.api_token);
     
     useEffect(() => {
@@ -113,7 +115,14 @@ export default function LastValues(props) {
                 );
                 setMoistureLoading(false);
             } catch (error) {
-                console.error("Error fetching data:", error);
+                if (error.response.status == 403 || error.response.status == 401) {
+                    alert('Error: ' + error.response.data.message);
+                    navigate('/login');
+                }
+                else {
+                    alert('Error: ' + error.response.data.error);
+                    console.error("Error fetching data:", error);
+                }
             }
         };
     
@@ -184,10 +193,14 @@ export default function LastValues(props) {
                     //     setMoistureLoading(false);
                     // }
                 } catch (error) {
-                    if (error.response.status == 400) {
-                        alert('400: Bad request');
+                    if (error.response.status == 403 || error.response.status == 401) {
+                        alert('Error: ' + error.response.data.message);
+                        navigate('/login');
                     }
-                    console.error("Error fetching data:", error);
+                    else {
+                        alert('Error: ' + error.response.data.error);
+                        console.error("Error fetching data:", error);
+                    }
                 }
                 // } finally {
                 //     if (sensor == 'temp') {
