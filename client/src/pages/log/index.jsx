@@ -33,7 +33,7 @@ export default function Log() {
                 <div></div>
                 ) : (
                 <div>
-                    <History api_token={sessionID}/>
+                    {/* <History api_token={sessionID}/> */}
                 </div>
 			)}
 		</div>

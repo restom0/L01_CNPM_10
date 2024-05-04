@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
@@ -7,8 +8,8 @@ import Switch from '@mui/material/Switch';
 export default function PumpState(props) {
     const [pumpState, setPumpState] = useState(false);
     const [loading, setLoading] = useState(true);
-    // const sessionID = document.cookie.split('; ').find((cookie) => cookie.startsWith(`sessionID=`)).split('=')[1]
     const [sessionID, setSessionID] = useState(props.api_token);
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchApiData = async () => {
             try {
@@ -21,7 +22,14 @@ export default function PumpState(props) {
                 setPumpState((pumpResponse.data.data.value == "OFF") ? false : true)
                 setLoading(false);
             } catch (error) {
-                console.error("Error fetching data:", error);
+                if (error.response.status == 403 || error.response.status == 401) {
+                    alert('Error: ' + error.response.data.message);
+                    navigate('/login');
+                }
+                else {
+                    alert('Error: ' + error.response.data.error);
+                    console.error("Error fetching data:", error);
+                }
             }
         };
     
@@ -37,7 +45,14 @@ export default function PumpState(props) {
             setPumpState(!pumpState); // Toggle pumpState after API call is successful
             await axios.post(apiEndpoint, {}, { headers: { Authorization: "Bearer " + sessionID } });
         } catch (error) {
-            console.error("Error toggling pump state:", error);
+            if (error.response.status == 403 || error.response.status == 401) {
+                alert('Error: ' + error.response.data.message);
+                navigate('/login');
+            }
+            else {
+                alert('Error: ' + error.response.data.error);
+                console.error("Error fetching data:", error);
+            }
         }
     };
 	return (
