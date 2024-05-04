@@ -36,7 +36,7 @@ export default function Dashboard() {
 					<div>
 					<PumpInfo api_token={sessionID}/>
 					<br></br>
-					{/* <History api_token={sessionID}/> */}
+					<History api_token={sessionID}/>
 					</div>
 				</div>		
 			)}
