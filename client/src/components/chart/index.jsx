@@ -69,7 +69,7 @@ export default function Charts(props) {
             }
         };
         fetchData();
-        const intervalId = setInterval(fetchApiData, 10 * 1000);
+        const intervalId = setInterval(fetchData, 10 * 1000);
 
         return () => clearInterval(intervalId);
     }, []);
