@@ -64,7 +64,7 @@ export default function Sidebar() {
 	const navigate = useNavigate();
 	const handleLogout = async () => { 
         try {
-            cookies.remove('sessionID');
+            localStorage.removeItem('sessionID');
             navigate('/login');
         }catch (error) {
             alert(error);

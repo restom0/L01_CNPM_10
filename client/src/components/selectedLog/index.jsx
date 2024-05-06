@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Cookies from 'universal-cookie';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { useNavigate } from 'react-router-dom';
@@ -10,10 +9,9 @@ function formatTime(dateString) {
     // Định dạng theo dạng 'ngày/tháng/năm giờ:phút:giây'
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
 }
-const cookies = new Cookies();
 
 export default function SeHistory(props) {
-    const [sessionID, setSessionID] = useState();
+    const [sessionID, setSessionID] = useState(localStorage.getItem('sessionID'));
     const [flag, setFlag] = useState(false);
     const [logData, setlogData] = useState([]);
     const [value, GetDate] = useState(new Date());
@@ -21,11 +19,10 @@ export default function SeHistory(props) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-				if (!cookies.get('sessionID')){
+				if (!localStorage.getItem('sessionID')){
 					navigate('/login');
 				}
                 else{
-                    setSessionID(cookies.get('sessionID'))
                     var newDate=new Date(value);
                     if (flag){
                         newDate.setDate(newDate.getDate() + 1);
@@ -49,10 +46,14 @@ export default function SeHistory(props) {
                     setlogData(fetchedLogs);
                 }
             } catch (error) {
-                if (error.response.status == 400) {
-                    alert('400: Bad request');
+                if (error.response.status == 403 || error.response.status == 401) {
+                    alert('Error: ' + error.response.data.message);
+                    navigate('/login');
                 }
-                console.error('Error fetching data:', error);
+                else {
+                    alert('Error: ' + error.response.data.error);
+                    console.error('Error fetching data:', error);
+                }
             }
         };
         fetchData();

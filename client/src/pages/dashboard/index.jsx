@@ -1,22 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import LastValues from '../../components/lastValues';
 import PumpInfo from '../../components/pumpInfo'
 import History from '../../components/history'
 
-const cookies = new Cookies();
 export default function Dashboard() {
-	const [sessionID, setSessionID] = useState('');
+	const [sessionID, setSessionID] = useState(localStorage.getItem('sessionID'));
 	const [loading, setLoading] = useState(true);
 	const navigate = useNavigate();
 	useEffect(() => {
         const fetchApiData = async () => {
 			try {
-				//const loginResponse = await axios.post(`http://localhost:3001/login`,{username: 'rang',password: 'rang'});
-                //setSessionID(loginResponse.data.api_token);
-				setSessionID(cookies.get('sessionID'));
-				if (!cookies.get('sessionID')){
+				if (!localStorage.getItem('sessionID')){
 					navigate('/login');
 				}
 				setLoading(false);
