@@ -13,7 +13,7 @@ AIO_USERNAME=config.get("AIO_USERNAME")
 AIO_KEY=config.get("AIO_KEY")
 myclient = pymongo.MongoClient("mongodb+srv://"+config.get("DATABASE_USERNAME")+":"+config.get("DATABASE_PASSWORD")+"@cluster0.mpdyonk.mongodb.net/")
 mydb = myclient["CMS"]
-mycol = mydb["Users"]
+mycol = mydb["users"]
 mydoc=mycol.find_one({"username":"rang","password":"rang"})
 def  connected(client):
     print("Kết nối thành công")
