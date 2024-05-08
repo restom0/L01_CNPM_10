@@ -9,8 +9,6 @@ export default function Chart() {
 	useEffect(() => {
         const fetchApiData = async () => {
 			try {
-				//const loginResponse = await axios.post(`http://localhost:3001/login`,{username: 'rang',password: 'rang'});
-                //setSessionID(loginResponse.data.api_token);
 				if (!localStorage.getItem('sessionID')){
 					navigate('/login');
 				}

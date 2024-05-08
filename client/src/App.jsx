@@ -7,7 +7,7 @@ import Setting from "./pages/setting";
 import Login from "./pages/login";
 import Signup from "./pages/signup";
 import Log from "./pages/log";
-import User from "./pages/user";
+// import User from "./pages/user";
 
 function App() {
   return (
@@ -21,7 +21,7 @@ function App() {
           <Route path="log" element={<Log />} />
           <Route path="setting" element={<Setting />} />
           <Route path="log" element={<Log />} />
-          <Route path="user" element={<User />} />
+          {/* <Route path="user" element={<User />} /> */}
         </Route>
       </Routes>
     </Router>

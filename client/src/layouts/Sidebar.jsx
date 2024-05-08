@@ -34,12 +34,12 @@ const DASHBOARD_SIDEBAR_LINKS = [
 		path: '/log',
 		icon: <HiDocument />
 	},
-	{
-		key: 'user',
-		label: 'Tài khoản',
-		path: '/user',
-		icon: <HiUser />
-	}
+	// {
+	// 	key: 'user',
+	// 	label: 'Tài khoản',
+	// 	path: '/user',
+	// 	icon: <HiUser />
+	// }
 ]
 
 
