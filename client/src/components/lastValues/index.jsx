@@ -56,6 +56,7 @@ export default function LastValues(props) {
     const [lightLoading, setLightLoading] = useState(true);
     const [humidLoading, setHumidLoading] = useState(true);
     const [moistureLoading, setMoistureLoading] = useState(true);
+    const [EDLoading, setEDLoading] = useState(true);
     const navigate = useNavigate();
     const [sessionID, setSessionID] = useState(props.api_token);
     
@@ -125,11 +126,37 @@ export default function LastValues(props) {
                 }
             }
         };
+
+        const fetchEDApiData = async () => {
+            try {
+                const config = {
+                    headers: {
+                        Authorization: "Bearer " + sessionID,
+                    }
+                };
+                const EDResponse = await axios.get(`http://localhost:3001/sensors/ed`, config);
+                setEDLoading(false);
+            } catch (error) {
+                if (error.response.status == 403 || error.response.status == 401) {
+                    alert('Error: ' + error.response.data.message);
+                    navigate('/login');
+                }
+                else {
+                    alert('Error: ' + error.response.data.error);
+                    console.error("Error fetching data:", error);
+                }
+            }
+        };
     
         fetchApiData();
-        const intervalId = setInterval(fetchApiData, 10 * 1000);
+        fetchEDApiData();
+        // const otherIntervalId = setInterval(fetchApiData, 10 * 1000);
+        // const EDintervalId = setInterval(fetchEDApiData, 30 * 1000);
 
-        return () => clearInterval(intervalId);
+        // return () => {
+        //     clearInterval(otherIntervalId);
+        //     clearInterval(EDintervalId);
+        // }
     }, []);
 
     function handleKeyDown(e, sensor) {
