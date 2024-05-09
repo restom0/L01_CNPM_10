@@ -150,13 +150,13 @@ export default function LastValues(props) {
     
         fetchApiData();
         fetchEDApiData();
-        // const otherIntervalId = setInterval(fetchApiData, 10 * 1000);
-        // const EDintervalId = setInterval(fetchEDApiData, 30 * 1000);
+        const otherIntervalId = setInterval(fetchApiData, 10 * 1000);
+        const EDintervalId = setInterval(fetchEDApiData, 30 * 1000);
 
-        // return () => {
-        //     clearInterval(otherIntervalId);
-        //     clearInterval(EDintervalId);
-        // }
+        return () => {
+            clearInterval(otherIntervalId);
+            clearInterval(EDintervalId);
+        }
     }, []);
 
     function handleKeyDown(e, sensor) {
