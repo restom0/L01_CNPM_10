@@ -11,6 +11,8 @@ const Sensor = new Schema({
   lowerMoistureThreshold: Number,
   upperTemperatureThreshold: Number,
   lowerTemperatureThreshold: Number,
+  lowerEnvironmentDrynessThreshold: Number,
+  upperEnvironmentDrynessThreshold: Number,
   lightFeedName: { type: String, required: true },
   humidityFeedName: { type: String, required: true },
   moistureFeedName: { type: String, required: true },

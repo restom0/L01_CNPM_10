@@ -38,7 +38,14 @@ const getAllMoistureValue = async (req, res, next) => {
     res.status(error.statusCode).json({ error: error.message })
   }
 }
-
+const getAllEnvironmentValue = async (req, res, next) => {
+  try {
+    const result = await SensorService.getAllEnvironmentValue(req.user.id)
+    res.status(200).json({ data: result })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
 const getLastHumidityValue = async (req, res, next) => {
   try {
     const result = await SensorService.getLastHumidityValue(req.user.mqtt, req.user.id)
@@ -93,6 +100,16 @@ const getLastMoistureValue = async (req, res, next) => {
       lower: res.threshold.lower,
       data: result
     })
+  } catch (error) {
+    res.status(error.statusCode).json({ error: error.message })
+  }
+}
+const getLastEnvironmentValue = async (req, res, next) => {
+  try {
+    const result = await SensorService.getLastEnvironmentValue(req.user.mqtt, req.user.id)
+    if (result) {
+      res.status(200).json({ data: result })
+    }
   } catch (error) {
     res.status(error.statusCode).json({ error: error.message })
   }
@@ -238,5 +255,7 @@ export const SensorController = {
   getHumidityThreshold,
   updateHumidityThreshold,
   getMoistureThreshold,
-  updateMoistureThreshold
+  updateMoistureThreshold,
+  getLastEnvironmentValue,
+  getAllEnvironmentValue
 }

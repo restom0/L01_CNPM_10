@@ -11,8 +11,11 @@ SensorRouter.get('/chart/humid', SensorController.getAllHumidityValue)
 SensorRouter.get('/chart/light', SensorController.getAllLightValue)
 SensorRouter.get('/chart/temp', SensorController.getAllTemperatureValue)
 SensorRouter.get('/chart/moisture', SensorController.getAllMoistureValue)
-export { SensorRouter }
+
 SensorRouter.put('/threshold/humid', SensorController.updateHumidityThreshold)
 SensorRouter.put('/threshold/light', SensorController.updateLightThreshold)
 SensorRouter.put('/threshold/temp', SensorController.updateTemperatureThreshold)
 SensorRouter.put('/threshold/moisture', SensorController.updateMoistureThreshold)
+SensorRouter.get('/ed', SensorController.getLastEnvironmentValue)
+SensorRouter.get('/chart/ed', SensorController.getAllEnvironmentValue)
+export { SensorRouter }
