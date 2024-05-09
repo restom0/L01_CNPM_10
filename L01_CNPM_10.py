@@ -8,7 +8,7 @@ import datetime
 from dotenv import dotenv_values
 
 config = dotenv_values(".env")
-AIO_FEED_IDS=config.get("AIO_FEED_IDS").split(",")
+AIO_FEED_IDS=["cambienanhsang","cambiendoamdat","cambiennhietdo","cambiendoam","maybom1","maybom2"]
 AIO_USERNAME=config.get("AIO_USERNAME")
 AIO_KEY=config.get("AIO_KEY")
 myclient = pymongo.MongoClient("mongodb+srv://"+config.get("DATABASE_USERNAME")+":"+config.get("DATABASE_PASSWORD")+"@cluster0.mpdyonk.mongodb.net/")
@@ -19,7 +19,6 @@ def  connected(client):
     print("Kết nối thành công")
     for feed in AIO_FEED_IDS:
         client.subscribe(feed)
-
 def  subscribe(client , userdata , mid , granted_qos):
     print("Đăng ký thành công")
 

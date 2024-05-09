@@ -81,9 +81,10 @@ const getLastEnvironmentValue = async (key, mqtt, id) => {
   const light = await getLastLightValue(mqtt, id)
   const temp = await getLastTemperatureValue(mqtt, id)
   const moist = await getLastMoistureValue(mqtt, id)
-  const ED = humidity.value + light.value - temp.value - moist.value
+  var temper = parseFloat(light.value) / 40.0
+  const ED = temper + parseFloat(temp.value) - parseFloat(humidity.value) - parseFloat(moist.value)
   const result = await EnvironmentalDrynessModel.find({ userID: id }).sort({ Date: -1 })
-  const estimatedED = result[0].data * 0.875 + ED * 0.125
+  const estimatedED = result[0].data * 0.125 + ED * 0.875
   const ted = await SensorModel.findOne({ userID: id })
   if (estimatedED > ted.upperEnvironmentDrynessThreshold) {
     const waterpumpStatus = await WaterPumpService.getLastWaterPumpValue(mqtt, id)
@@ -190,8 +191,8 @@ const updateEnvironmentDrynessThreshold = async (id) => {
   const light = await getLightThreshold(id)
   const humid = await getHumidityThreshold(id)
   const moist = await getMoistureThreshold(id)
-  const upper = temp.upper + light.upper - humid.lower - moist.lower
-  const lower = temp.lower + light.lower - humid.upper - moist.upper
+  const upper = temp.upper + light.upper / 40 - humid.lower - moist.lower
+  const lower = temp.lower + light.lower / 40 - humid.upper - moist.upper
   const sensor = await SensorModel.findOneAndUpdate(
     { userID: id },
     { upperEnvironmentDrynessThreshold: upper, lowerEnvironmentDrynessThreshold: lower }
