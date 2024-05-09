@@ -1,20 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import Cookies from 'universal-cookie';
 import { useNavigate } from 'react-router-dom';
 import Charts from '../../components/chart'
 
-const cookies = new Cookies();
 export default function Chart() {
-	const [sessionID, setSessionID] = useState('');
+	const [sessionID, setSessionID] = useState(localStorage.getItem('sessionID'));
 	const [loading, setLoading] = useState(true);
 	const navigate = useNavigate();
 	useEffect(() => {
         const fetchApiData = async () => {
 			try {
-				//const loginResponse = await axios.post(`http://localhost:3001/login`,{username: 'rang',password: 'rang'});
-                //setSessionID(loginResponse.data.api_token);
-				setSessionID(cookies.get('sessionID'));
-				if (!cookies.get('sessionID')){
+				if (!localStorage.getItem('sessionID')){
 					navigate('/login');
 				}
 				setLoading(false);

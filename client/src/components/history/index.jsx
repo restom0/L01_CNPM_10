@@ -30,10 +30,15 @@ export default function History(props) {
                 }));
                 setlogData(fetchedLogs);
             } catch (error) {
-                if (error.response.status == 400) {
-                    alert('400: Bad request');
+                if (error.response.status == 403 || error.response.status == 401) {
+                    alert('Error: ' + error.response.data.message);
+                    navigate('/login');
                 }
-                console.error('Error fetching data:', error);
+                else {
+                    alert('Error: ' + error.response.data.error);
+                    console.error('Error fetching data:', error);
+                }
+                
             }
         };
         fetchData();
