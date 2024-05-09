@@ -106,12 +106,12 @@ const getLastMoistureValue = async (req, res, next) => {
 }
 const getLastEnvironmentValue = async (req, res, next) => {
   try {
-    const result = await SensorService.getLastEnvironmentValue(req.user.mqtt, req.user.id)
+    const result = await SensorService.getLastEnvironmentValue(req.user.key, req.user.mqtt, req.user.id)
     if (result) {
       res.status(200).json({ data: result })
     }
   } catch (error) {
-    res.status(error.statusCode).json({ error: error.message })
+    res.status(500).json({ error: error.message })
   }
 }
 

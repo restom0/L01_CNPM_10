@@ -48,6 +48,7 @@ const deleteTimer = async (id) => {
 }
 const turnOnPump = async (key, mqtt, id) => {
   const sensor = await SensorModel.findOne({ userID: id })
+  
   if (CommonUtils.checkNullOrUndefined(sensor)) {
     throw new NotFoundError('Water Pump not found')
   }
