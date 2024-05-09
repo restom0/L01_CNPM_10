@@ -13,10 +13,12 @@ export default function Charts(props) {
     const [lightLoading, setLightLoading] = useState(true);
     const [humidLoading, setHumidLoading] = useState(true);
     const [moistureLoading, setMoistureLoading] = useState(true);
+    const [EDLoading, setEDLoading] = useState(true);
     const [processedTemp, setProcessedTemp] = useState([[{ type: "date", label: "time" }, "°C"]]);
     const [processedLight, setProcessedLight] = useState([[{ type: "date", label: "time" }, "lux"]]);
     const [processedHumid, setProcessedHumid] = useState([[{ type: "date", label: "time" }, "%"]]);
     const [processedMoisture, setProcessedMoisture] = useState([[{ type: "date", label: "time" }, "%"]]);
+    const [processedED, setProcessedED] = useState([[{ type: "date", label: "time" }, ""]]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -57,6 +59,14 @@ export default function Charts(props) {
                     })
                 ));
                 setMoistureLoading(false);
+                
+                const EDResponse = await axios.get(`http://localhost:3001/sensors/chart/ed`, config);
+                setProcessedED(processedED.concat(
+                    EDResponse.data.data.map(({_id, userID, data, Date}) => {
+                        return [toDate(Date), parseFloat(data)];
+                    })
+                ));
+                setEDLoading(false);
             } catch (error) {
                 if (error.response.status == 403 || error.response.status == 401) {
                     alert('Error: ' + error.response.data.message);
@@ -76,6 +86,38 @@ export default function Charts(props) {
 
     return (
         <div>
+            <div className='h-[500px] rounded-lg bg-white mb-4'>
+                <div name='title-subtitle' className='pl-1 pt-2'>
+                    <div name='title' className='font-bold'>
+                        Độ khô của môi trường
+                    </div>
+                </div>
+                {EDLoading ? (
+                    <div className='h-[500px] rounded-lg bg-white mb-4 text-center leading-[400px]'>
+                        <CircularProgress
+                            variant='indeterminate' value={50}
+                            size={50}
+                            thickness={3}
+                        />
+                    </div>
+                    ) : (
+                        <div>
+                        <Chart
+                            height={"400px"}
+                            width={"100%"}
+                            chartType="LineChart"
+                            data={processedED}
+                            options={{
+                                pointSize: 2,
+                                lineWidth: 1,
+                                series: {
+                                    0: { pointShape: 'circle' },
+                                }
+                            }}
+                            />
+                    </div>
+                )}
+            </div>
             <div className='h-[500px] rounded-lg bg-white mb-4'>
                 <div name='title-subtitle' className='pl-1 pt-2'>
                     <div name='title' className='font-bold'>
