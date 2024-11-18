@@ -16,7 +16,7 @@ import { logRequestTime } from './src/middlewares/logRequestTime.js'
 import { logRequestMethod } from './src/middlewares/logRequestMethod.js'
 import { DATABASE_CONFIG } from './src/configs/database.js'
 import { requireApiKey } from './src/middlewares/useApiKey.js'
-
+import cron from 'node-cron';
 const app = express()
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
@@ -50,7 +50,9 @@ app.use('/sensors', requireApiKey, SensorRouter)
 app.use('/logs', requireApiKey, LogRouter)
 app.use('/waterpumps', requireApiKey, WaterPumpRouter)
 app.use('/', UserRouter)
-
+cron.schedule('0 0 * * *', () => {
+  console.log('Running a task every minute');
+});
 const DB_CONNECTION_STR =
   'mongodb+srv://' + DATABASE_CONFIG.username + ':' + DATABASE_CONFIG.password + '@cluster0.mpdyonk.mongodb.net/CMS'
 async function start() {
