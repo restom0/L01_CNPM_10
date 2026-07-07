@@ -11,7 +11,7 @@ const automaticWatering = async (id) => {
     throw new NotFoundError('Water Pump not found')
   }
   const timer = await WaterPumpTimerModel.find({ userID: id })
-  let result = []
+  const result = []
   timer.forEach((e) => {
     result.push({ id: e._id, startTime: e.startTime, endTime: e.endTime })
   })
@@ -48,7 +48,7 @@ const deleteTimer = async (id) => {
 }
 const turnOnPump = async (key, mqtt, id) => {
   const sensor = await SensorModel.findOne({ userID: id })
-  
+
   if (CommonUtils.checkNullOrUndefined(sensor)) {
     throw new NotFoundError('Water Pump not found')
   }

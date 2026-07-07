@@ -6,13 +6,15 @@ import { NotFoundError } from '../errors/notFound.error.js'
 import { ForbiddenRequestError } from '../errors/forbiddenRequest.error.js'
 import { UnAuthorizedError } from '../errors/unauthorizedRequest.error.js'
 
+const JWT_SECRET = process.env.JWT_SECRET || 'secret'
+
 export const createApiKey = (data) => {
   const token = jwt.sign(
     {
       exp: Math.floor(Date.now() / 1000) + 8 * 60 * 60,
       data
     },
-    'secret'
+    JWT_SECRET
   )
   return token
 }
@@ -22,7 +24,7 @@ export const requireApiKey = async (req, res, next) => {
       throw new UnAuthorizedError('You need to login')
     }
     const apiKey = req.headers.authorization.split(' ')[1]
-    jwt.verify(apiKey, 'secret', async (err, decoded) => {
+    jwt.verify(apiKey, JWT_SECRET, async (err, decoded) => {
       if (err || !decoded) {
         const exception = new ForbiddenRequestError('Invalid access')
         res.status(exception.statusCode).send({ message: exception.message })

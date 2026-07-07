@@ -1,0 +1,69 @@
+import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest'
+import { UserService } from './UserService.js'
+import { UserModel } from '../models/Users.js'
+import { BadRequestError } from '../errors/badRequest.error.js'
+import { connectTestDb, clearTestDb, closeTestDb } from '../../test/db.js'
+
+beforeAll(connectTestDb)
+afterEach(clearTestDb)
+afterAll(closeTestDb)
+
+const sample = {
+  username: 'alice',
+  password: 'pw123',
+  mqttUsername: 'alice-mqtt',
+  aioKey: 'AIO_KEY_XYZ'
+}
+
+describe('UserService.register (IT)', () => {
+  it('persists a new user and returns it', async () => {
+    const saved = await UserService.register(
+      sample.username,
+      sample.password,
+      sample.mqttUsername,
+      sample.aioKey
+    )
+    expect(saved.username).toBe('alice')
+    expect(saved.mqttusername).toBe('alice-mqtt')
+    expect(saved.AIO_Key).toBe('AIO_KEY_XYZ')
+
+    const count = await UserModel.countDocuments({ username: 'alice' })
+    expect(count).toBe(1)
+  })
+
+  it('rejects a duplicate username with BadRequestError', async () => {
+    await UserService.register(sample.username, sample.password, sample.mqttUsername, sample.aioKey)
+    await expect(
+      UserService.register(sample.username, 'other', 'm', 'k')
+    ).rejects.toBeInstanceOf(BadRequestError)
+  })
+})
+
+describe('UserService.login (IT)', () => {
+  it('returns the user for correct credentials', async () => {
+    await UserService.register(sample.username, sample.password, sample.mqttUsername, sample.aioKey)
+    const found = await UserService.login('alice', 'pw123')
+    expect(found).not.toBeNull()
+    expect(found.username).toBe('alice')
+  })
+
+  it('returns null for a wrong password', async () => {
+    await UserService.register(sample.username, sample.password, sample.mqttUsername, sample.aioKey)
+    const found = await UserService.login('alice', 'nope')
+    expect(found).toBeNull()
+  })
+})
+
+describe('UserService.authorize (IT)', () => {
+  it('finds a user by id string', async () => {
+    const saved = await UserService.register(
+      sample.username,
+      sample.password,
+      sample.mqttUsername,
+      sample.aioKey
+    )
+    const found = await UserService.authorize(saved._id.toHexString())
+    expect(found).not.toBeNull()
+    expect(found.username).toBe('alice')
+  })
+})

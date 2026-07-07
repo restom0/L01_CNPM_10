@@ -81,7 +81,7 @@ const getLastEnvironmentValue = async (key, mqtt, id) => {
   const light = await getLastLightValue(mqtt, id)
   const temp = await getLastTemperatureValue(mqtt, id)
   const moist = await getLastMoistureValue(mqtt, id)
-  var temper = parseFloat(light.value) / 40.0
+  const temper = parseFloat(light.value) / 40.0
   const ED = temper + parseFloat(temp.value) - parseFloat(humidity.value) - parseFloat(moist.value)
   const result = await EnvironmentalDrynessModel.find({ userID: id }).sort({ Date: -1 })
   const estimatedED = result[0].data * 0.125 + ED * 0.875

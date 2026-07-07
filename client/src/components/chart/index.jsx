@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {CircularProgress} from '@mui/material';
 import { Chart } from 'react-google-charts';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function toDate(str) {
@@ -8,6 +9,7 @@ function toDate(str) {
 }
 
 export default function Charts(props) {
+    const navigate = useNavigate();
     const [sessionID, setSessionID] = useState(props.api_token);
     const [tempLoading, setTempLoading] = useState(true);
     const [lightLoading, setLightLoading] = useState(true);

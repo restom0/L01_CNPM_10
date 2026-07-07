@@ -1,4 +1,4 @@
-function checkNullOrUndefined(...args) {
+function checkNullOrUndefined (...args) {
   for (const arg of args) {
     if (arg === null || arg === undefined) {
       return true
@@ -6,7 +6,7 @@ function checkNullOrUndefined(...args) {
   }
   return false
 }
-function compareThreshold(value, upper, lower) {
+function compareThreshold (value, upper, lower) {
   if (value >= lower && value <= upper) return false
   return true
 }

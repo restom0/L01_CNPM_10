@@ -2,11 +2,9 @@ import express, { json } from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
 import bodyParser from 'body-parser'
-import cookieParser from 'cookie-parser'
 import rateLimit from 'express-rate-limit'
 // import { createServer } from 'node:http'
 // import { Server } from 'socket.io'
-import axios from 'axios'
 import mongoose from 'mongoose'
 import { SensorRouter } from './src/routes/SensorRoute.js'
 import { LogRouter } from './src/routes/LogRoute.js'
@@ -16,8 +14,9 @@ import { logRequestTime } from './src/middlewares/logRequestTime.js'
 import { logRequestMethod } from './src/middlewares/logRequestMethod.js'
 import { DATABASE_CONFIG } from './src/configs/database.js'
 import { requireApiKey } from './src/middlewares/useApiKey.js'
-import cron from 'node-cron';
-const app = express()
+import cron from 'node-cron'
+import { fileURLToPath } from 'node:url'
+export const app = express()
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 // const server = createServer(app)
@@ -39,6 +38,7 @@ const limiter = rateLimit({
   standardHeaders: 'draft-7',
   legacyHeaders: false
 })
+app.use(limiter)
 
 app.use(json())
 app.use(express.static('public'))
@@ -50,16 +50,20 @@ app.use('/sensors', requireApiKey, SensorRouter)
 app.use('/logs', requireApiKey, LogRouter)
 app.use('/waterpumps', requireApiKey, WaterPumpRouter)
 app.use('/', UserRouter)
-cron.schedule('0 0 * * *', () => {
-  console.log('Running a task every minute');
-});
+
 const DB_CONNECTION_STR =
+  process.env.DATABASE_URL ||
   'mongodb+srv://' + DATABASE_CONFIG.username + ':' + DATABASE_CONFIG.password + '@cluster0.mpdyonk.mongodb.net/CMS'
-async function start() {
+
+export async function start () {
   try {
     console.log('Start connecting...')
     await mongoose.connect(DB_CONNECTION_STR)
     console.log('Connect success')
+
+    cron.schedule('0 0 * * *', () => {
+      console.log('Running a scheduled task')
+    })
 
     app.listen(port, () => {
       console.log(`Listening at port ${port}`)
@@ -69,4 +73,9 @@ async function start() {
   }
 }
 
-start()
+// Only boot the server when this file is run directly (`node server.js`),
+// not when it is imported by tests via supertest.
+const isDirectRun = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]
+if (isDirectRun) {
+  start()
+}
