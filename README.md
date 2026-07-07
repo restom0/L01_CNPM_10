@@ -1,5 +1,7 @@
 # Smart Garden CMS
 
+![Smart Garden CMS thumbnail](client/public/smart-garden-thumbnail.svg)
+
 Smart Garden CMS is a full-stack monitoring and watering-control app. The React client shows live sensor values, charts, logs, pump controls, and threshold settings. The Express API authenticates users, reads sensor and pump data from Adafruit IO, stores historical records in MongoDB, and sends pump commands back to Adafruit IO.
 
 ## Architecture

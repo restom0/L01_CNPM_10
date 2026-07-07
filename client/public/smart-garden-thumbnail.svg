@@ -1,0 +1,80 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Smart Garden CMS thumbnail</title>
+  <desc id="desc">Blue project thumbnail for a smart garden monitoring and watering dashboard.</desc>
+  <defs>
+    <linearGradient id="hero" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4FBFF"/>
+      <stop offset="0.58" stop-color="#E7F7FF"/>
+      <stop offset="1" stop-color="#D5ECFF"/>
+    </linearGradient>
+    <linearGradient id="primary" x1="110" y1="90" x2="520" y2="530" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F6CBF"/>
+      <stop offset="1" stop-color="#164399"/>
+    </linearGradient>
+    <linearGradient id="card" x1="720" y1="112" x2="1060" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F5FCFF"/>
+    </linearGradient>
+    <filter id="shadow" x="640" y="70" width="490" height="500" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#0A3A72" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#hero)"/>
+  <path d="M0 512C168 431 302 459 449 512C612 570 782 543 940 477C1055 429 1142 410 1200 422V630H0V512Z" fill="#0F6CBF" opacity="0.08"/>
+  <path d="M67 545C223 488 348 497 498 546C670 602 818 571 964 508C1059 467 1134 461 1200 478" stroke="#80DDEE" stroke-width="18" stroke-linecap="round" opacity="0.45"/>
+
+  <g transform="translate(92 90)">
+    <rect width="126" height="126" rx="30" fill="url(#primary)"/>
+    <path d="M63 28C63 28 31 65 31 88C31 108 44 121 63 121C82 121 95 108 95 88C95 65 63 28 63 28Z" fill="#FFFFFF"/>
+    <path d="M63 101V72" stroke="#0F6CBF" stroke-width="8" stroke-linecap="round"/>
+    <path d="M62 79C48 64 35 67 29 78C43 92 56 91 62 79Z" fill="#2E7D32"/>
+    <path d="M66 72C80 57 93 60 99 71C85 85 72 84 66 72Z" fill="#46B05E"/>
+  </g>
+
+  <text x="92" y="276" fill="#0B2447" font-family="Inter, Arial, sans-serif" font-size="72" font-weight="800">Smart Garden CMS</text>
+  <text x="96" y="334" fill="#164399" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="600">IoT monitoring and watering control</text>
+  <text x="96" y="388" fill="#374151" font-family="Inter, Arial, sans-serif" font-size="24">React dashboard, Express API, MongoDB history, Adafruit IO feeds.</text>
+
+  <g font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700">
+    <rect x="96" y="432" width="94" height="40" rx="20" fill="#DFF6FF"/>
+    <text x="124" y="458" fill="#0F6CBF">React</text>
+    <rect x="204" y="432" width="102" height="40" rx="20" fill="#DFF6FF"/>
+    <text x="228" y="458" fill="#0F6CBF">Express</text>
+    <rect x="320" y="432" width="110" height="40" rx="20" fill="#E8F6EC"/>
+    <text x="345" y="458" fill="#2E7D32">MongoDB</text>
+    <rect x="444" y="432" width="128" height="40" rx="20" fill="#EAF2FF"/>
+    <text x="468" y="458" fill="#164399">Adafruit IO</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="690" y="96" width="382" height="438" rx="34" fill="url(#card)"/>
+    <rect x="720" y="128" width="322" height="52" rx="18" fill="#0F6CBF"/>
+    <circle cx="747" cy="154" r="8" fill="#80DDEE"/>
+    <circle cx="773" cy="154" r="8" fill="#DFF6FF"/>
+    <text x="804" y="162" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700">Live dashboard</text>
+
+    <g font-family="Inter, Arial, sans-serif">
+      <rect x="720" y="208" width="146" height="108" rx="20" fill="#EAF8FF" stroke="#B9E7F5"/>
+      <text x="742" y="244" fill="#164399" font-size="18" font-weight="700">Humidity</text>
+      <text x="742" y="286" fill="#0F6CBF" font-size="36" font-weight="800">68%</text>
+      <path d="M824 284C824 284 805 305 805 319C805 331 813 339 824 339C835 339 843 331 843 319C843 305 824 284 824 284Z" fill="#80DDEE"/>
+
+      <rect x="896" y="208" width="146" height="108" rx="20" fill="#F0FAF3" stroke="#BFE8C8"/>
+      <text x="918" y="244" fill="#2E7D32" font-size="18" font-weight="700">Soil</text>
+      <text x="918" y="286" fill="#2E7D32" font-size="36" font-weight="800">42%</text>
+      <path d="M1004 298C981 273 956 278 944 296C966 322 992 317 1004 298Z" fill="#46B05E"/>
+
+      <rect x="720" y="346" width="322" height="136" rx="22" fill="#FFFFFF" stroke="#D9E7F2"/>
+      <text x="746" y="384" fill="#0B2447" font-size="20" font-weight="800">Pump schedule</text>
+      <rect x="746" y="410" width="88" height="38" rx="19" fill="#0F6CBF"/>
+      <text x="770" y="436" fill="#FFFFFF" font-size="18" font-weight="800">ON</text>
+      <path d="M866 432H1014" stroke="#80DDEE" stroke-width="12" stroke-linecap="round"/>
+      <path d="M866 456H950" stroke="#164399" stroke-width="8" stroke-linecap="round" opacity="0.32"/>
+    </g>
+  </g>
+
+  <path d="M624 525C637 484 671 464 710 469" stroke="#2E7D32" stroke-width="12" stroke-linecap="round"/>
+  <path d="M636 505C596 468 556 473 535 504C574 544 615 537 636 505Z" fill="#46B05E"/>
+  <path d="M651 482C688 443 728 449 747 479C711 518 670 512 651 482Z" fill="#2E7D32"/>
+</svg>

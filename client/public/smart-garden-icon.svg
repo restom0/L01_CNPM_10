@@ -1,0 +1,42 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Smart Garden CMS icon</title>
+  <desc id="desc">Blue smart garden icon with water, leaf, sensor, and pump signal motifs.</desc>
+  <defs>
+    <linearGradient id="bg" x1="88" y1="40" x2="424" y2="472" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F6CBF"/>
+      <stop offset="1" stop-color="#164399"/>
+    </linearGradient>
+    <linearGradient id="drop" x1="250" y1="120" x2="250" y2="356" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#DFF6FF"/>
+    </linearGradient>
+    <filter id="softShadow" x="84" y="82" width="344" height="344" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#082B5F" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <path d="M96 378C150 346 210 344 256 372C303 401 362 399 416 366" stroke="#80DDEE" stroke-width="22" stroke-linecap="round" opacity="0.34"/>
+  <path d="M104 416C160 389 214 389 258 414C304 441 356 438 408 409" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" opacity="0.18"/>
+
+  <g filter="url(#softShadow)">
+    <path d="M256 105C256 105 155 216 155 285C155 346 199 389 256 389C313 389 357 346 357 285C357 216 256 105 256 105Z" fill="url(#drop)"/>
+    <path d="M256 116C256 116 166 219 166 284C166 337 204 377 256 377C308 377 346 337 346 284C346 219 256 116 256 116Z" stroke="#EAF8FF" stroke-width="8"/>
+  </g>
+
+  <path d="M256 325V238" stroke="#0F6CBF" stroke-width="18" stroke-linecap="round"/>
+  <path d="M253 255C216 214 178 221 160 250C197 290 236 284 253 255Z" fill="#2E7D32"/>
+  <path d="M260 237C297 197 335 204 353 233C316 273 277 267 260 237Z" fill="#46B05E"/>
+  <path d="M189 253C211 256 232 258 253 255" stroke="#BDEFD0" stroke-width="8" stroke-linecap="round"/>
+  <path d="M327 235C305 239 282 239 260 237" stroke="#D3F7DE" stroke-width="8" stroke-linecap="round"/>
+
+  <circle cx="256" cy="331" r="24" fill="#0F6CBF"/>
+  <circle cx="256" cy="331" r="9" fill="#FFFFFF"/>
+  <path d="M126 152C154 124 191 108 232 108" stroke="#80DDEE" stroke-width="14" stroke-linecap="round" opacity="0.78"/>
+  <path d="M117 207C142 187 173 176 206 176" stroke="#80DDEE" stroke-width="14" stroke-linecap="round" opacity="0.58"/>
+  <circle cx="102" cy="226" r="11" fill="#80DDEE"/>
+  <circle cx="244" cy="108" r="11" fill="#80DDEE"/>
+
+  <path d="M358 343H397C409 343 419 353 419 365V384C419 396 409 406 397 406H358" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.78"/>
+  <path d="M358 375H301" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" opacity="0.78"/>
+</svg>
