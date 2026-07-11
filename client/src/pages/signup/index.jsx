@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import loginBackground from '../../assets/images/login_background.png';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import LanguageSwitcher from '../../components/languageSwitcher';
+import { useI18n } from '../../i18n';
 
 export default function Signup() {
     const [username, setUsername] = useState('');
@@ -10,76 +12,80 @@ export default function Signup() {
     const [mqttUsername, setMqttUsername] = useState('');
     const [aioKey, setAioKey] = useState('');
     const navigate = useNavigate();
+    const { t } = useI18n();
     const handleRegister = async () => { 
         try {
             if (username==''){
-                alert("Username không được để trống!")
+                alert(t('error.usernameRequired'))
             }
             else if (password==''){
-                alert("Password không được để trống!")
+                alert(t('error.passwordRequired'))
             }
             else if (mqttUsername=='') {
-                alert("mqttUsername không được để trống!")
+                alert(t('error.mqttUsernameRequired'))
             }
             else if (aioKey=='') {
-                alert("aioKey không được để trống!")
+                alert(t('error.aioKeyRequired'))
             }
             else if (password != rePassword){
-                alert('Mật khẩu không khớp!');
+                alert(t('error.passwordMismatch'));
             }
             else{
                 const registerResponse = await axios.post('http://localhost:3001/register',{username: username,password: password,mqttUsername: mqttUsername,aioKey: aioKey});
                 if (registerResponse.data.data=="Register successfully"){
-                    alert('Đăng ký thành công!');
+                    alert(t('register.success'));
                     setTimeout(() => {
                         navigate('/login');
                     }, 100);
                 }
             }
         }catch (error) {
-            if (error.response.status == 400) {
-                if (error.response.data.error=="Account existed"){
-                    alert("Tài khoản đã tồn tại!")
+            if (error.response?.status == 400) {
+                if (error.response?.data?.error=="Account existed"){
+                    alert(t('error.accountExists'))
                 }
                 else{
-                    alert('400: Bad request');
+                    alert(t('error.badRequest'));
                 }
             }
             else{
-                alert(error);
+                alert(error.message || error);
             }
         }
     };
     return (
-        <div className="min-h-screen h-screen bg-cover flex items-center justify-center" style={{backgroundImage: `url(${loginBackground})`, backgroundPosition: 'center bottom'}}>
-            <div className="w-4/12 bg-white lg:h-[675px] 2xl:h-[695px] rounded-xl p-8 flex flex-col justify-center items-center">
-                <p className="font-semibold text-center text-xl pt-2">Đăng ký</p>
-                <div className="mt-8 w-2/3">
-                    <p className="font-semibold">Username</p>
+        <div className="relative min-h-screen h-screen bg-cover flex items-center justify-center" style={{backgroundImage: `url(${loginBackground})`, backgroundPosition: 'center bottom'}}>
+            <div className="absolute right-[var(--spacing-section)] top-[var(--spacing-section)]">
+                <LanguageSwitcher />
+            </div>
+            <div className="w-4/12 bg-white lg:h-[675px] 2xl:h-[695px] rounded-xl p-[var(--spacing-section)] flex flex-col justify-center items-center">
+                <p className="font-semibold text-center text-xl pt-[var(--spacing-x)]">{t('auth.signup')}</p>
+                <div className="mt-[var(--spacing-section)] w-2/3">
+                    <p className="font-semibold">{t('auth.username')}</p>
                     <input type="text" className="w-full px-4 py-2 border-none rounded-2xl bg-gray-100" required placeholder="" value={username} onChange={(e) => setUsername(e.target.value)}/>
                 </div>
-                <div className="mt-4 w-2/3">
-                    <p className="font-semibold">Password</p>
+                <div className="mt-[var(--spacing-y)] w-2/3">
+                    <p className="font-semibold">{t('auth.password')}</p>
                     <input type="password" className="w-full px-4 py-2 border-none rounded-2xl bg-gray-100" required placeholder="" value={password} onChange={(e) => setPassword(e.target.value)}/>
                 </div>
-                <div className="mt-4 w-2/3">
-                    <p className="font-semibold">Re-enter password</p>
+                <div className="mt-[var(--spacing-y)] w-2/3">
+                    <p className="font-semibold">{t('auth.reEnterPassword')}</p>
                     <input type="password" className="w-full px-4 py-2 border-none rounded-2xl bg-gray-100" required placeholder="" value={rePassword} onChange={(e) => setRePassword(e.target.value)}/>
                 </div>
-                <div className="mt-4 w-2/3">
-                    <p className="font-semibold">Adafruit username</p>
+                <div className="mt-[var(--spacing-y)] w-2/3">
+                    <p className="font-semibold">{t('auth.adafruitUsername')}</p>
                     <input type="text" className="w-full px-4 py-2 border-none rounded-2xl bg-gray-100" required placeholder="" value={mqttUsername} onChange={(e) => setMqttUsername(e.target.value)}/>
                 </div>
-                <div className="mt-4 w-2/3">
-                    <p className="font-semibold">AioKey</p>
+                <div className="mt-[var(--spacing-y)] w-2/3">
+                    <p className="font-semibold">{t('auth.aioKey')}</p>
                     <input type="password" className="w-full px-4 py-2 border-none rounded-2xl bg-gray-100" required placeholder="" value={aioKey} onChange={(e) => setAioKey(e.target.value)}/>
                 </div>
-                <div className="mt-6 w-2/3">
-                    <button className="w-full bg-sky-600 text-white py-1 px-4 rounded-xl hover:bg-sky-700 font-semibold" onClick={handleRegister}>Đăng ký</button>
+                <div className="mt-[var(--spacing-section)] w-2/3">
+                    <button className="w-full min-h-[44px] bg-sky-600 text-white py-1 px-4 rounded-xl hover:bg-sky-700 font-semibold" onClick={handleRegister}>{t('auth.signup')}</button>
                 </div>
-                <div className="mt-2 w-full text-center">
-                    <p className="inline-block">Đã có tài khoản,&nbsp;</p>
-                    <a href="" className="text-sky-500 underline hover:text-sky-700"  onClick={() => navigate('/login')}>Đăng nhập tại đây</a>    
+                <div className="mt-[var(--spacing-x)] w-full text-center">
+                    <p className="inline-block">{t('auth.haveAccount')}&nbsp;</p>
+                    <button type="button" className="text-sky-500 underline hover:text-sky-700" onClick={() => navigate('/login')}>{t('auth.loginHere')}</button>
                 </div>
             </div>
         </div>

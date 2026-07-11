@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import {CircularProgress, TextField} from '@mui/material';
+import {CircularProgress} from '@mui/material';
 import { MdCancel, MdEdit } from 'react-icons/md';
+import { DUMMY_PUMP_AUTOS } from '../../data/dummyData';
+import { getApiErrorMessage, isUnauthorized } from '../../utils/apiError';
+import { useI18n } from '../../i18n';
 
 export default function ShowPumpAuto(props) {
     const [pumpAutos, setPumpAutos] = useState([]);
@@ -11,8 +14,9 @@ export default function ShowPumpAuto(props) {
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
     const [showSettingsIcon, setShowSettingsIcon] = useState(true);
-    const [sessionID, setSessionID] = useState(props.api_token);
+    const sessionID = props.api_token;
     const navigate = useNavigate();
+    const { t } = useI18n();
 
     const handleStartTimeChange = (e) => {
         setStartTime(e.target.value);
@@ -35,14 +39,13 @@ export default function ShowPumpAuto(props) {
                 }
             };
             await axios.put(`http://localhost:3001/waterpumps/auto/` + id, {'startTime':startTime,'endTime':endTime}, config);
-            alert('Sửa giờ tự động tưới thành công');
+            alert(t('pump.editAutoSuccess'));
         } catch (error) {
-            if (error.response.status == 403 || error.response.status == 401) {
-                alert('Error: ' + error.response.data.message);
+            if (isUnauthorized(error)) {
+                alert('Error: ' + getApiErrorMessage(error));
                 navigate('/login');
             }
             else {
-                alert('Error: ' + error.response.data.error);
                 console.error("Error fetching data:", error);
             }
         }
@@ -58,13 +61,16 @@ export default function ShowPumpAuto(props) {
                 }
             };
             await axios.delete(`http://localhost:3001/waterpumps/auto/` + id, config);
+            setPumpAutos((current) => current.filter((pumpAuto) => pumpAuto.id !== id));
+            setLoading(false);
         } catch (error) {
-            if (error.response.status == 403 || error.response.status == 401) {
-                alert('Error: ' + error.response.data.message);
+            if (isUnauthorized(error)) {
+                alert('Error: ' + getApiErrorMessage(error));
                 navigate('/login');
             }
             else {
-                alert('Error: ' + error.response.data.error);
+                setPumpAutos((current) => current.filter((pumpAuto) => pumpAuto.id !== id));
+                setLoading(false);
                 console.error("Error fetching data:", error);
             }
         }
@@ -82,12 +88,13 @@ export default function ShowPumpAuto(props) {
                 setPumpAutos(pumpAutosResponse.data.data);
                 setLoading(false);
             } catch (error) {
-                if (error.response.status == 403 || error.response.status == 401) {
-                    alert('Error: ' + error.response.data.message);
+                if (isUnauthorized(error)) {
+                    alert('Error: ' + getApiErrorMessage(error));
                     navigate('/login');
                 }
                 else {
-                    alert('Error: ' + error.response.data.error);
+                    setPumpAutos(DUMMY_PUMP_AUTOS);
+                    setLoading(false);
                     console.error("Error fetching data:", error);
                 }
             }
@@ -98,7 +105,7 @@ export default function ShowPumpAuto(props) {
         const intervalId = setInterval(fetchApiData, 10 * 1000);
 
         return () => clearInterval(intervalId);
-    }, []);
+    }, [navigate, sessionID]);
 
     return (
         <div>
@@ -115,28 +122,28 @@ export default function ShowPumpAuto(props) {
                     {
                         pumpAutos.map((pumpAuto, index) => (
                             <div key={index} className=''>
-                                <div className='h-[30px] rounded-full bg-lightGray pl-1 mr-1 mt-2 leading-[30px]'>
+                                <div className='h-[44px] rounded-full bg-lightGray pl-[var(--spacing-x)] mr-[var(--spacing-x)] mt-[var(--spacing-y)] leading-[44px]'>
                                     {showSettingsIcon ? (
                                         <MdEdit onClick={handleIconClick} className='inline mr-1' cursor={'pointer'} color='black' size={20}/>
                                     ) : (
                                         <MdCancel onClick={handleIconClick} className='inline mr-1' cursor={'pointer'} color='black' size={20}/>
                                     )}
-                                    From {pumpAuto.startTime} To {pumpAuto.endTime}
-                                    <button className="bg-mainRed text-center rounded-full w-[50px] text-white float-right" onClick={() => deletePumpAuto(pumpAuto.id)}>Hủy</button>
+                                    {t('common.from')} {pumpAuto.startTime} {t('common.to')} {pumpAuto.endTime}
+                                    <button className="bg-mainRed text-center rounded-full min-h-[44px] w-[64px] text-white float-right" onClick={() => deletePumpAuto(pumpAuto.id)}>{t('common.cancel')}</button>
                                 </div>
                                 {showModal && (
                                     <div className="modal">
                                         <div className="modal-content">
-                                            <div className='mx-2 mt-2'>
-                                                <label className='w-[200px]'>Start Time:</label><br/>
+                                            <div className='mx-[var(--spacing-x)] mt-[var(--spacing-y)]'>
+                                                <label className='w-[200px]'>{t('common.startTime')}</label><br/>
                                                 <input className='rounded-full' type="time" value={startTime} onChange={handleStartTimeChange} />
                                             </div>
-                                            <div className='ml-2 mt-2'>
-                                                <label>End Time:</label><br/>
+                                            <div className='ml-[var(--spacing-x)] mt-[var(--spacing-y)]'>
+                                                <label>{t('common.endTime')}</label><br/>
                                                 <input className='rounded-full' type="time" value={endTime} onChange={handleEndTimeChange} />
                                             </div>
                                             <div className='float-right'>
-                                                <button className="bg-mainBlue text-center rounded-full w-[60px] text-white m-2" onClick={() => handleSubmit(pumpAuto.id)}>OK</button>
+                                                <button className="bg-mainBlue text-center rounded-full min-h-[44px] w-[60px] text-white m-[var(--spacing-x)]" onClick={() => handleSubmit(pumpAuto.id)}>{t('common.ok')}</button>
                                             </div>
                                             <div className='clear-both'></div>
                                         </div>

@@ -4,7 +4,7 @@ import LastValues from '../../components/lastValues';
 import PumpManagement from '../../components/pumpManagement'
 
 export default function Setting() {
-	const [sessionID, setSessionID] = useState(localStorage.getItem('sessionID'));
+	const sessionID = localStorage.getItem('sessionID');
 	const [loading, setLoading] = useState(true);
 	const navigate = useNavigate();
 	useEffect(() => {
@@ -23,9 +23,9 @@ export default function Setting() {
 	return (
 		<div>
 			{loading ? (
-                <div></div>
+				<div></div>
                 ) : (
-				<div className='lg:flex md:block w-full h-[1000px] gap-[20px]'>
+				<div className='lg:flex md:block w-full min-h-[1000px] gap-x-[var(--spacing-x)] gap-y-[var(--spacing-section)]'>
 					<LastValues api_token={sessionID}/>
 					<PumpManagement api_token={sessionID}/>
 				</div>		

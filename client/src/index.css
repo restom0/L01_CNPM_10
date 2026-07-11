@@ -75,3 +75,30 @@ button:focus-visible {
 
 /* Keep the existing JS theme (custom colors + spacing) and flowbite plugin. */
 @config '../tailwind.config.js';
+
+:root {
+  --spacing-x: 12px;
+  --spacing-y: 16px;
+  --spacing-section: calc(var(--spacing-y) * 2);
+  --spacing-body: calc(var(--spacing-x) * 5);
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+p,
+li {
+  text-wrap: pretty;
+}

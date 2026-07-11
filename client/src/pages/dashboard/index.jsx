@@ -5,7 +5,7 @@ import PumpInfo from '../../components/pumpInfo'
 import History from '../../components/history'
 
 export default function Dashboard() {
-	const [sessionID, setSessionID] = useState(localStorage.getItem('sessionID'));
+	const sessionID = localStorage.getItem('sessionID');
 	const [loading, setLoading] = useState(true);
 	const navigate = useNavigate();
 	useEffect(() => {
@@ -24,13 +24,12 @@ export default function Dashboard() {
 	return (
 		<div>
 			{loading ? (
-                <div></div>
+				<div></div>
                 ) : (
-					<div className='lg:flex md:block w-full h-[1000px] gap-[20px]'>
+					<div className='lg:flex md:block w-full min-h-[1000px] gap-x-[var(--spacing-x)] gap-y-[var(--spacing-section)]'>
 					<LastValues api_token={sessionID}/>
-					<div>
+					<div className='flex flex-col gap-y-[var(--spacing-section)]'>
 					<PumpInfo api_token={sessionID}/>
-					<br></br>
 					<History api_token={sessionID}/>
 					</div>
 				</div>		

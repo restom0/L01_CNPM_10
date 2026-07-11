@@ -32,9 +32,9 @@
     <path d="M66 72C80 57 93 60 99 71C85 85 72 84 66 72Z" fill="#46B05E"/>
   </g>
 
-  <text x="92" y="276" fill="#0B2447" font-family="Inter, Arial, sans-serif" font-size="72" font-weight="800">Smart Garden CMS</text>
+  <text x="92" y="276" fill="#0B2447" font-family="Inter, Arial, sans-serif" font-size="64" font-weight="800">Smart Garden CMS</text>
   <text x="96" y="334" fill="#164399" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="600">IoT monitoring and watering control</text>
-  <text x="96" y="388" fill="#374151" font-family="Inter, Arial, sans-serif" font-size="24">React dashboard, Express API, MongoDB history, Adafruit IO feeds.</text>
+  <text x="96" y="388" fill="#374151" font-family="Inter, Arial, sans-serif" font-size="24">React + Express + MongoDB + Adafruit IO.</text>
 
   <g font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700">
     <rect x="96" y="432" width="94" height="40" rx="20" fill="#DFF6FF"/>

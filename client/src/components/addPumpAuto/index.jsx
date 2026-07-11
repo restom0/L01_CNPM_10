@@ -1,17 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { IoMdSettings } from 'react-icons/io';
 import { MdCancel } from 'react-icons/md';
+import { getApiErrorMessage, isUnauthorized } from '../../utils/apiError';
+import { useI18n } from '../../i18n';
 
 export default function AddPumpAuto(props) {
     const [showModal, setShowModal] = useState(false);
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
     const [showSettingsIcon, setShowSettingsIcon] = useState(true);
-    const [sessionID, setSessionID] = useState(props.api_token);
+    const sessionID = props.api_token;
 
     const navigate = useNavigate();
+    const { t } = useI18n();
 
 
     const handleStartTimeChange = (e) => {
@@ -35,14 +38,13 @@ export default function AddPumpAuto(props) {
                 }
             };
             await axios.post(`http://localhost:3001/waterpumps/auto`, {'startTime':startTime, 'endTime':endTime}, config);
-            alert('Thêm giờ tự động tưới thành công');
+            alert(t('pump.addAutoSuccess'));
         } catch (error) {
-            if (error.response.status == 403 || error.response.status == 401) {
-                alert('Error: ' + error.response.data.message);
+            if (isUnauthorized(error)) {
+                alert('Error: ' + getApiErrorMessage(error));
                 navigate('/login');
             }
             else {
-                alert('Error: ' + error.response.data.error);
                 console.error("Error fetching data:", error);
             }
         }
@@ -50,8 +52,8 @@ export default function AddPumpAuto(props) {
 
     return (
         <div>
-            <div className='pr-1 pt-2 float-right'>
-                Thêm giờ
+            <div className='pr-[var(--spacing-x)] pt-[var(--spacing-y)] float-right'>
+                {t('pump.addTime')}
                 {showSettingsIcon ? (
                     <IoMdSettings onClick={handleIconClick} className='inline ml-1' cursor={'pointer'} color='black' size={20}/>
                 ) : (
@@ -63,16 +65,16 @@ export default function AddPumpAuto(props) {
             {showModal && (
                 <div className="modal">
                     <div className="modal-content">
-                        <div className='mx-2 mt-2'>
-                            <label className='w-[200px]'>Start Time:</label><br/>
+                        <div className='mx-[var(--spacing-x)] mt-[var(--spacing-y)]'>
+                            <label className='w-[200px]'>{t('common.startTime')}</label><br/>
                             <input className='rounded-full' type="time" value={startTime} onChange={handleStartTimeChange} />
                         </div>
-                        <div className='ml-2 mt-2'>
-                            <label>End Time:</label><br/>
+                        <div className='ml-[var(--spacing-x)] mt-[var(--spacing-y)]'>
+                            <label>{t('common.endTime')}</label><br/>
                             <input className='rounded-full' type="time" value={endTime} onChange={handleEndTimeChange} />
                         </div>
                         <div className='float-right'>
-                            <button className="bg-mainBlue text-center rounded-full w-[60px] text-white m-2" onClick={handleSubmit}>OK</button>
+                            <button className="bg-mainBlue text-center rounded-full min-h-[44px] w-[60px] text-white m-[var(--spacing-x)]" onClick={handleSubmit}>{t('common.ok')}</button>
                         </div>
                         <div className='clear-both'></div>
                     </div>

@@ -21,7 +21,7 @@ function renderInRouter(ui) {
 describe('<PumpState /> (client)', () => {
   it('shows the loading state on first render', () => {
     renderInRouter(<PumpState api_token="fake-token" />)
-    expect(screen.getByText('Loading...')).toBeInTheDocument()
+    expect(screen.getByText('Đang tải...')).toBeInTheDocument()
   })
 
   it('renders without crashing when no api_token is provided', () => {

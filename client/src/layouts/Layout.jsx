@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React from 'react'
 import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -10,7 +10,7 @@ export default function Layout() {
 				<Sidebar />
 				<div className="flex flex-col flex-1">
 					<Header />
-					<div className="flex-1 p-[20px] overflow-x-hidden">
+					<div className="flex-1 px-[var(--spacing-body)] py-[var(--spacing-section)] overflow-x-hidden overflow-y-auto">
 						<Outlet />
 					</div>
 				</div>

@@ -10,6 +10,9 @@ import SoilMoistureWarning from "../../assets/images/soil-moisture-warning.svg";
 import SoilMoistureGood from "../../assets/images/soil-moisture-good.svg";
 import AirHumidityWarning from "../../assets/images/air-humidity-warning.svg";
 import AirHumidityGood from "../../assets/images/air-humidity-good.svg";
+import { DUMMY_SENSOR_RESPONSES } from "../../data/dummyData";
+import { getApiErrorMessage, isUnauthorized } from "../../utils/apiError";
+import { useI18n } from "../../i18n";
 
 function formatDateInfo(inputTime) {
   // const date = new Date(inputTime);
@@ -47,6 +50,25 @@ function formatTime(inputTime) {
   return `${hours}:${minutes} ${day}/${month}/${year}`;
 }
 
+function toSensorInfo(response) {
+  return {
+    value: parseFloat(response.data.value),
+    time: formatTime(response.data.created_at),
+    lowerThreshold: response.lower,
+    upperThreshold: response.upper,
+    needNoti: response.needNoti,
+  };
+}
+
+function toLightInfo(response) {
+  return {
+    ...toSensorInfo(response),
+    valuePercent: (response.data.value * 100) / 10000,
+    lowerThresholdPercent: (response.lower * 100) / 10000,
+    upperThresholdPercent: (response.upper * 100) / 10000,
+  };
+}
+
 export default function LastValues(props) {
   const [tempInfo, setTempInfo] = useState(null);
   const [lightInfo, setLightInfo] = useState(null);
@@ -58,7 +80,20 @@ export default function LastValues(props) {
   const [moistureLoading, setMoistureLoading] = useState(true);
   const [EDLoading, setEDLoading] = useState(true);
   const navigate = useNavigate();
-  const [sessionID, setSessionID] = useState(props.api_token);
+  const sessionID = props.api_token;
+  const { t } = useI18n();
+
+  const setSensorLoading = (sensor, value) => {
+    if (sensor == "temp") {
+      setTempLoading(value);
+    } else if (sensor == "light") {
+      setLightLoading(value);
+    } else if (sensor == "humid") {
+      setHumidLoading(value);
+    } else {
+      setMoistureLoading(value);
+    }
+  };
 
   useEffect(() => {
     const fetchApiData = async () => {
@@ -84,47 +119,27 @@ export default function LastValues(props) {
           `http://localhost:3001/sensors/moisture`,
           config
         );
-        setTempInfo({
-          value: parseFloat(tempResponse.data.data.value),
-          time: formatTime(tempResponse.data.data.created_at),
-          lowerThreshold: tempResponse.data.lower,
-          upperThreshold: tempResponse.data.upper,
-          needNoti: tempResponse.data.needNoti,
-        });
+        setTempInfo(toSensorInfo(tempResponse.data));
         setTempLoading(false);
-        setLightInfo({
-          value: parseFloat(lightResponse.data.data.value),
-          valuePercent: (lightResponse.data.data.value * 100) / 10000,
-          time: formatTime(lightResponse.data.data.created_at),
-          lowerThreshold: lightResponse.data.lower,
-          upperThreshold: lightResponse.data.upper,
-          lowerThresholdPercent: (lightResponse.data.lower * 100) / 10000,
-          upperThresholdPercent: (lightResponse.data.upper * 100) / 10000,
-          needNoti: lightResponse.data.needNoti,
-        });
+        setLightInfo(toLightInfo(lightResponse.data));
         setLightLoading(false);
-        setHumidInfo({
-          value: parseFloat(humidResponse.data.data.value),
-          time: formatTime(humidResponse.data.data.created_at),
-          lowerThreshold: humidResponse.data.lower,
-          upperThreshold: humidResponse.data.upper,
-          needNoti: humidResponse.data.needNoti,
-        });
+        setHumidInfo(toSensorInfo(humidResponse.data));
         setHumidLoading(false);
-        setMoistureInfo({
-          value: parseFloat(moistureResponse.data.data.value),
-          time: formatTime(moistureResponse.data.data.created_at),
-          lowerThreshold: moistureResponse.data.lower,
-          upperThreshold: moistureResponse.data.upper,
-          needNoti: moistureResponse.data.needNoti,
-        });
+        setMoistureInfo(toSensorInfo(moistureResponse.data));
         setMoistureLoading(false);
       } catch (error) {
-        if (error.response.status == 403 || error.response.status == 401) {
-          alert("Error: " + error.response.data.message);
+        if (isUnauthorized(error)) {
+          alert("Error: " + getApiErrorMessage(error));
           navigate("/login");
         } else {
-          alert("Error: " + error.response.data.error);
+          setTempInfo(toSensorInfo(DUMMY_SENSOR_RESPONSES.temp));
+          setLightInfo(toLightInfo(DUMMY_SENSOR_RESPONSES.light));
+          setHumidInfo(toSensorInfo(DUMMY_SENSOR_RESPONSES.humid));
+          setMoistureInfo(toSensorInfo(DUMMY_SENSOR_RESPONSES.moisture));
+          setTempLoading(false);
+          setLightLoading(false);
+          setHumidLoading(false);
+          setMoistureLoading(false);
           console.error("Error fetching data:", error);
         }
       }
@@ -143,11 +158,11 @@ export default function LastValues(props) {
         );
         setEDLoading(false);
       } catch (error) {
-        if (error.response.status == 403 || error.response.status == 401) {
-          alert("Error: " + error.response.data.message);
+        if (isUnauthorized(error)) {
+          alert("Error: " + getApiErrorMessage(error));
           navigate("/login");
         } else {
-          alert("Error: " + error.response.data.error);
+          setEDLoading(false);
           console.error("Error fetching data:", error);
         }
       }
@@ -162,7 +177,7 @@ export default function LastValues(props) {
       clearInterval(otherIntervalId);
       clearInterval(EDintervalId);
     };
-  }, []);
+  }, [navigate, sessionID]);
 
   function handleKeyDown(e, sensor) {
     if (e.key === "Enter") {
@@ -219,6 +234,7 @@ export default function LastValues(props) {
           }
 
           await axios.put(api_url, {}, config);
+          setSensorLoading(sensor, false);
 
           // if (sensor == 'temp') {
           //     setTempLoading(false);
@@ -233,11 +249,11 @@ export default function LastValues(props) {
           //     setMoistureLoading(false);
           // }
         } catch (error) {
-          if (error.response.status == 403 || error.response.status == 401) {
-            alert("Error: " + error.response.data.message);
+          if (isUnauthorized(error)) {
+            alert("Error: " + getApiErrorMessage(error));
             navigate("/login");
           } else {
-            alert("Error: " + error.response.data.error);
+            setSensorLoading(sensor, false);
             console.error("Error fetching data:", error);
           }
         }
@@ -264,15 +280,15 @@ export default function LastValues(props) {
   return (
     <div>
       <div className="md:w-[650px] xl:w-[700px] 2xl:w-[900px]">
-        <div className="grid grid-cols-2 gap-[20px] w-full">
+        <div className="grid grid-cols-2 gap-x-[var(--spacing-x)] gap-y-[var(--spacing-y)] w-full">
           <div className="col-span-1 bg-white h-[400px]">
-            <div name="title-subtitle" className="ml-1 mt-2">
+            <div name="title-subtitle" className="ml-[var(--spacing-x)] mt-[var(--spacing-y)]">
               <div name="title" className="font-bold">
-                Nhiệt độ (°C)
+                {t('sensor.temperature')}
               </div>
-              <div name="subtitle">Lấy từ cảm biến nhiệt độ</div>
+              <div name="subtitle">{t('sensor.sourceTemperature')}</div>
             </div>
-            <div className="w-[300px] h-[300px] mx-auto mt-2">
+            <div className="w-[300px] h-[300px] mx-auto mt-[var(--spacing-y)]">
               <div className="flex flex-col justify-center items-center">
                 {tempLoading ? (
                   <div className="md:w-[650px] xl:w-[700px] 2xl:w-[900px] h-[800px] text-center leading-[200px]">
@@ -402,6 +418,7 @@ export default function LastValues(props) {
                     <div className="flex top-0 left-0 bottom-0 right-0 absolute justify-center items-center">
                       <div className="flex flex-col justify-center items-center">
                         <img
+                          alt=""
                           src={
                             tempInfo.needNoti
                               ? TemperatureCelsiusWarning
@@ -419,8 +436,8 @@ export default function LastValues(props) {
                           {tempInfo.value} °C
                           <div className="font-normal text-[1rem]">
                             {tempInfo.needNoti
-                              ? "Nhiệt độ ngoài ngưỡng"
-                              : "Nhiệt độ bình thường"}
+                              ? t('sensor.temperatureOutOfRange')
+                              : t('sensor.temperatureNormal')}
                           </div>
                         </div>
                         <div>{formatDateInfo(tempInfo.time)}</div>
@@ -429,13 +446,13 @@ export default function LastValues(props) {
                   </div>
                 )}
               </div>
-              <div name="threshold" className="m-3">
+              <div name="threshold" className="mx-[var(--spacing-x)] mt-[var(--spacing-y)]">
                 <div className="float-left">
-                  Ngưỡng dưới
+                  {t('common.lowerThreshold')}
                   {tempLoading ? (
                     <div></div>
                   ) : (
-                    <div className="mx-auto w-[80px] h-[25px]">
+                    <div className="mx-auto w-[96px] h-[44px]">
                       <input
                         type="number"
                         className="bg-mainRed text-center rounded-full w-full h-full text-white"
@@ -455,11 +472,11 @@ export default function LastValues(props) {
                   )}
                 </div>
                 <div className="float-right">
-                  Ngưỡng trên
+                  {t('common.upperThreshold')}
                   {tempLoading ? (
                     <div></div>
                   ) : (
-                    <div className="mx-auto w-[80px] h-[25px]">
+                    <div className="mx-auto w-[96px] h-[44px]">
                       <input
                         type="number"
                         className="bg-mainRed text-center rounded-full w-full h-full text-white"
@@ -484,13 +501,13 @@ export default function LastValues(props) {
             </div>
           </div>
           <div className="col-span-1 bg-white h-[400px]">
-            <div name="title-subtitle" className="ml-1 mt-2">
+            <div name="title-subtitle" className="ml-[var(--spacing-x)] mt-[var(--spacing-y)]">
               <div name="title" className="font-bold">
-                Ánh sáng (lux)
+                {t('sensor.light')}
               </div>
-              <div name="subtitle">Lấy từ cảm biến ánh sáng</div>
+              <div name="subtitle">{t('sensor.sourceLight')}</div>
             </div>
-            <div className="w-[300px] h-[300px] mx-auto mt-2">
+            <div className="w-[300px] h-[300px] mx-auto mt-[var(--spacing-y)]">
               <div className="flex flex-col justify-center items-center">
                 {lightLoading ? (
                   <div className="md:w-[650px] xl:w-[700px] 2xl:w-[900px] h-[800px] text-center leading-[200px]">
@@ -627,6 +644,7 @@ export default function LastValues(props) {
                     <div className="flex top-0 left-0 bottom-0 right-0 absolute justify-center items-center">
                       <div className="flex flex-col justify-center items-center">
                         <img
+                          alt=""
                           src={
                             lightInfo.needNoti
                               ? LightIntensityWarning
@@ -644,8 +662,8 @@ export default function LastValues(props) {
                           {lightInfo.value} lux
                           <div className="font-normal text-[1rem]">
                             {lightInfo.needNoti
-                              ? "Ánh sáng ngoài ngưỡng"
-                              : "Ánh sáng bình thường"}
+                              ? t('sensor.lightOutOfRange')
+                              : t('sensor.lightNormal')}
                           </div>
                         </div>
                         <div>{formatDateInfo(lightInfo.time)}</div>
@@ -654,13 +672,13 @@ export default function LastValues(props) {
                   </div>
                 )}
               </div>
-              <div name="threshold" className="m-3">
+              <div name="threshold" className="mx-[var(--spacing-x)] mt-[var(--spacing-y)]">
                 <div className="float-left">
-                  Ngưỡng dưới
+                  {t('common.lowerThreshold')}
                   {lightLoading ? (
                     <div></div>
                   ) : (
-                    <div className="mx-auto w-[80px] h-[25px]">
+                    <div className="mx-auto w-[96px] h-[44px]">
                       <input
                         type="number"
                         className="bg-mainRed text-center rounded-full w-full h-full text-white"
@@ -680,11 +698,11 @@ export default function LastValues(props) {
                   )}
                 </div>
                 <div className="float-right">
-                  Ngưỡng trên
+                  {t('common.upperThreshold')}
                   {lightLoading ? (
                     <div></div>
                   ) : (
-                    <div className="mx-auto w-[80px] h-[25px]">
+                    <div className="mx-auto w-[96px] h-[44px]">
                       <input
                         type="number"
                         className="bg-mainRed text-center rounded-full w-full h-full text-white"
@@ -708,13 +726,13 @@ export default function LastValues(props) {
             </div>
           </div>
           <div className="col-span-1 bg-white h-[400px]">
-            <div name="title-subtitle" className="ml-1 mt-2">
+            <div name="title-subtitle" className="ml-[var(--spacing-x)] mt-[var(--spacing-y)]">
               <div name="title" className="font-bold">
-                Độ ẩm không khí (%)
+                {t('sensor.airHumidity')}
               </div>
-              <div name="subtitle">Lấy từ cảm biến độ ẩm</div>
+              <div name="subtitle">{t('sensor.sourceAirHumidity')}</div>
             </div>
-            <div className="w-[300px] h-[300px] mx-auto mt-2">
+            <div className="w-[300px] h-[300px] mx-auto mt-[var(--spacing-y)]">
               <div className="flex flex-col justify-center items-center">
                 {humidLoading ? (
                   <div className="md:w-[650px] xl:w-[700px] 2xl:w-[900px] h-[800px] text-center leading-[200px]">
@@ -846,6 +864,7 @@ export default function LastValues(props) {
                     <div className="flex top-0 left-0 bottom-0 right-0 absolute justify-center items-center">
                       <div className="flex flex-col justify-center items-center">
                         <img
+                          alt=""
                           src={
                             humidInfo.needNoti
                               ? AirHumidityWarning
@@ -863,8 +882,8 @@ export default function LastValues(props) {
                           {humidInfo.value} %
                           <div className="font-normal text-[1rem]">
                             {humidInfo.needNoti
-                              ? "Độ ẩm ngoài ngưỡng"
-                              : "Độ ẩm bình thường"}
+                              ? t('sensor.humidityOutOfRange')
+                              : t('sensor.humidityNormal')}
                           </div>
                         </div>
                         <div>{formatDateInfo(humidInfo.time)}</div>
@@ -873,13 +892,13 @@ export default function LastValues(props) {
                   </div>
                 )}
               </div>
-              <div name="threshold" className="m-3">
+              <div name="threshold" className="mx-[var(--spacing-x)] mt-[var(--spacing-y)]">
                 <div className="float-left">
-                  Ngưỡng dưới
+                  {t('common.lowerThreshold')}
                   {humidLoading ? (
                     <div></div>
                   ) : (
-                    <div className="mx-auto w-[80px] h-[25px]">
+                    <div className="mx-auto w-[96px] h-[44px]">
                       <input
                         type="number"
                         className="bg-mainRed text-center rounded-full w-full h-full text-white"
@@ -899,11 +918,11 @@ export default function LastValues(props) {
                   )}
                 </div>
                 <div className="float-right">
-                  Ngưỡng trên
+                  {t('common.upperThreshold')}
                   {humidLoading ? (
                     <div></div>
                   ) : (
-                    <div className="mx-auto w-[80px] h-[25px]">
+                    <div className="mx-auto w-[96px] h-[44px]">
                       <input
                         type="number"
                         className="bg-mainRed text-center rounded-full w-full h-full text-white"
@@ -927,13 +946,13 @@ export default function LastValues(props) {
             </div>
           </div>
           <div className="col-span-1 bg-white h-[400px]">
-            <div name="title-subtitle" className="ml-1 mt-2">
+            <div name="title-subtitle" className="ml-[var(--spacing-x)] mt-[var(--spacing-y)]">
               <div name="title" className="font-bold">
-                Độ ẩm đất (%)
+                {t('sensor.soilMoisture')}
               </div>
-              <div name="subtitle">Lấy từ cảm biến độ ẩm đất</div>
+              <div name="subtitle">{t('sensor.sourceSoilMoisture')}</div>
             </div>
-            <div className="w-[300px] h-[300px] mx-auto mt-2">
+            <div className="w-[300px] h-[300px] mx-auto mt-[var(--spacing-y)]">
               <div className="flex flex-col justify-center items-center">
                 {moistureLoading ? (
                   <div className="md:w-[650px] xl:w-[700px] 2xl:w-[900px] h-[800px] text-center leading-[200px]">
@@ -1069,6 +1088,7 @@ export default function LastValues(props) {
                     <div className="flex top-0 left-0 bottom-0 right-0 absolute justify-center items-center">
                       <div className="flex flex-col justify-center items-center">
                         <img
+                          alt=""
                           src={
                             moistureInfo.needNoti
                               ? SoilMoistureWarning
@@ -1086,8 +1106,8 @@ export default function LastValues(props) {
                           {moistureInfo.value} %
                           <div className="font-normal text-[1rem]">
                             {moistureInfo.needNoti
-                              ? "Độ ẩm ngoài ngưỡng"
-                              : "Độ ẩm bình thường"}
+                              ? t('sensor.humidityOutOfRange')
+                              : t('sensor.humidityNormal')}
                           </div>
                         </div>
                         <div>{formatDateInfo(moistureInfo.time)}</div>
@@ -1096,13 +1116,13 @@ export default function LastValues(props) {
                   </div>
                 )}
               </div>
-              <div name="threshold" className="m-3">
+              <div name="threshold" className="mx-[var(--spacing-x)] mt-[var(--spacing-y)]">
                 <div className="float-left">
-                  Ngưỡng dưới
+                  {t('common.lowerThreshold')}
                   {moistureLoading ? (
                     <div></div>
                   ) : (
-                    <div className="mx-auto w-[80px] h-[25px]">
+                    <div className="mx-auto w-[96px] h-[44px]">
                       <input
                         type="number"
                         className="bg-mainRed text-center rounded-full w-full h-full text-white"
@@ -1122,11 +1142,11 @@ export default function LastValues(props) {
                   )}
                 </div>
                 <div className="float-right">
-                  Ngưỡng trên
+                  {t('common.upperThreshold')}
                   {moistureLoading ? (
                     <div></div>
                   ) : (
-                    <div className="mx-auto w-[80px] h-[25px]">
+                    <div className="mx-auto w-[96px] h-[44px]">
                       <input
                         type="number"
                         className="bg-mainRed text-center rounded-full w-full h-full text-white"

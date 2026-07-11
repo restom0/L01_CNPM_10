@@ -4,6 +4,10 @@ export default {
   theme: {
     extend: {
       spacing: {
+        spacingX: '12px',
+        spacingY: '16px',
+        section: '32px',
+        body: '60px',
         '1': '8px',
         '2': '12px',
         '3': '16px',

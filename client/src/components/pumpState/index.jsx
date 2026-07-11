@@ -4,12 +4,16 @@ import { useNavigate } from 'react-router-dom';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
+import { DUMMY_PUMP_STATE } from '../../data/dummyData';
+import { getApiErrorMessage, isUnauthorized } from '../../utils/apiError';
+import { useI18n } from '../../i18n';
 
 export default function PumpState(props) {
     const [pumpState, setPumpState] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [sessionID, setSessionID] = useState(props.api_token);
+    const sessionID = props.api_token;
     const navigate = useNavigate();
+    const { t } = useI18n();
     useEffect(() => {
         const fetchApiData = async () => {
             try {
@@ -22,12 +26,13 @@ export default function PumpState(props) {
                 setPumpState((pumpResponse.data.data.value == "OFF") ? false : true)
                 setLoading(false);
             } catch (error) {
-                if (error.response.status == 403 || error.response.status == 401) {
-                    alert('Error: ' + error.response.data.message);
+                if (isUnauthorized(error)) {
+                    alert('Error: ' + getApiErrorMessage(error));
                     navigate('/login');
                 }
                 else {
-                    alert('Error: ' + error.response.data.error);
+                    setPumpState(DUMMY_PUMP_STATE !== "OFF");
+                    setLoading(false);
                     console.error("Error fetching data:", error);
                 }
             }
@@ -38,19 +43,18 @@ export default function PumpState(props) {
         const intervalId = setInterval(fetchApiData, 10 * 1000);
 
         return () => clearInterval(intervalId);
-    }, []);
+    }, [navigate, sessionID]);
     const handleSwitchChange = async () => {
         try {
             const apiEndpoint = pumpState ? "http://localhost:3001/waterpumps/manual/off" : "http://localhost:3001/waterpumps/manual/on";
             setPumpState(!pumpState); // Toggle pumpState after API call is successful
             await axios.post(apiEndpoint, {}, { headers: { Authorization: "Bearer " + sessionID } });
         } catch (error) {
-            if (error.response.status == 403 || error.response.status == 401) {
-                alert('Error: ' + error.response.data.message);
+            if (isUnauthorized(error)) {
+                alert('Error: ' + getApiErrorMessage(error));
                 navigate('/login');
             }
             else {
-                alert('Error: ' + error.response.data.error);
                 console.error("Error fetching data:", error);
             }
         }
@@ -58,18 +62,18 @@ export default function PumpState(props) {
 	return (
         <div>
             {loading ? (
-            <div className='ml-1 mt-2'>Loading...</div>
+            <div className='ml-[var(--spacing-x)] mt-[var(--spacing-y)]'>{t('common.loading')}</div>
             ) : (
-                <div className='ml-1 mt-2'>
+                <div className='ml-[var(--spacing-x)] mt-[var(--spacing-y)]'>
                     <div name='title'>
-                        Trạng thái hoạt động
+                        {t('pump.status')}
                     </div>
                     <div>
                         
                         <FormGroup>
                             <FormControlLabel
                                 control={<Switch checked={pumpState} onChange={handleSwitchChange}  />}
-                                label={(pumpState) ? "Máy bơm 1 đang hoạt động" : "Máy bơm 1 đang tắt"}
+                                label={(pumpState) ? t('pump.running') : t('pump.stopped')}
                             />
                         </FormGroup>
                     </div>

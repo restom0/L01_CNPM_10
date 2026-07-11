@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Charts from '../../components/chart'
 
 export default function Chart() {
-	const [sessionID, setSessionID] = useState(localStorage.getItem('sessionID'));
+	const sessionID = localStorage.getItem('sessionID');
 	const [loading, setLoading] = useState(true);
 	const navigate = useNavigate();
 	useEffect(() => {
