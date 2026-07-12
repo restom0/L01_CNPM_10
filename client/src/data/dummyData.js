@@ -76,3 +76,12 @@ export const DUMMY_PUMP_AUTOS = [
 ];
 
 export const DUMMY_PUMP_STATE = "ON";
+
+// Demo admin account: lets you sign in without a running backend. On login the
+// dashboard falls back to the DUMMY_* data above (API calls fail with a network
+// error, which is treated as non-auth and renders demo data).
+export const DUMMY_ADMIN = {
+  username: "admin",
+  password: "admin",
+  token: "demo-admin-token",
+};

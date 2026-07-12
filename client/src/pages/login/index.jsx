@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import LanguageSwitcher from '../../components/languageSwitcher';
 import { useI18n } from '../../i18n';
+import { DUMMY_ADMIN } from '../../data/dummyData';
 
 export default function Login() {
     const [username, setUsername] = useState('');
@@ -18,6 +19,11 @@ export default function Login() {
             }
             else if (password==''){
                 alert(t('error.passwordRequired'))
+            }
+            else if (username === DUMMY_ADMIN.username && password === DUMMY_ADMIN.password) {
+                // Demo admin: sign in without a backend; the dashboard renders dummy data.
+                localStorage.setItem('sessionID', DUMMY_ADMIN.token);
+                navigate('/dashboard');
             }
             else {
                 const loginResponse = await axios.post(`http://localhost:3001/login`,{username: username,password: password});
