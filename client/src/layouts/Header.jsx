@@ -1,11 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { IoMdSettings, IoIosNotifications } from 'react-icons/io'
 import { Link } from 'react-router-dom'
-import LanguageSwitcher from '../components/languageSwitcher'
+import SettingsDialog from '../components/settingsDialog'
 import { useI18n } from '../i18n'
 
 export default function Header() {
 	const { t } = useI18n();
+	const [settingsOpen, setSettingsOpen] = useState(false);
 
 	return (
 		<div className="bg-blue h-[90px] px-[var(--spacing-body)] flex items-center border-b border-gray-200 justify-between">
@@ -15,10 +16,23 @@ export default function Header() {
 				</Link>
 			</div>
 			<div className="flex items-center gap-x-[var(--spacing-x)]">
-				<LanguageSwitcher />
-				<IoMdSettings cursor={'pointer'} color='white' size={20}/>
-				<IoIosNotifications cursor={'pointer'} color='white' size={20}/>
+				<button
+					type="button"
+					onClick={() => setSettingsOpen(true)}
+					aria-label={t('settings.title')}
+					className="rounded-md p-1 text-white outline-none hover:opacity-80 focus-visible:ring-2 focus-visible:ring-white"
+				>
+					<IoMdSettings size={22} />
+				</button>
+				<button
+					type="button"
+					aria-label={t('nav.user')}
+					className="rounded-md p-1 text-white outline-none hover:opacity-80 focus-visible:ring-2 focus-visible:ring-white"
+				>
+					<IoIosNotifications size={22} />
+				</button>
 			</div>
+			<SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
 		</div>
 	)
 }

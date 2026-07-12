@@ -281,17 +281,17 @@ export default function LastValues(props) {
     <div>
       <div className="md:w-[650px] xl:w-[700px] 2xl:w-[900px]">
         <div className="grid grid-cols-2 gap-x-[var(--spacing-x)] gap-y-[var(--spacing-y)] w-full">
-          <div className="col-span-1 bg-white h-[400px]">
+          <div className="col-span-1 bg-white rounded-xl shadow-sm pb-[var(--spacing-y)]">
             <div name="title-subtitle" className="ml-[var(--spacing-x)] mt-[var(--spacing-y)]">
               <div name="title" className="font-bold">
                 {t('sensor.temperature')}
               </div>
               <div name="subtitle">{t('sensor.sourceTemperature')}</div>
             </div>
-            <div className="w-[300px] h-[300px] mx-auto mt-[var(--spacing-y)]">
+            <div className="w-[300px] mx-auto mt-[var(--spacing-y)]">
               <div className="flex flex-col justify-center items-center">
                 {tempLoading ? (
-                  <div className="md:w-[650px] xl:w-[700px] 2xl:w-[900px] h-[800px] text-center leading-[200px]">
+                  <div className="w-[250px] h-[250px] flex items-center justify-center">
                     <CircularProgress
                       variant="indeterminate"
                       value={50}
@@ -500,17 +500,17 @@ export default function LastValues(props) {
               </div>
             </div>
           </div>
-          <div className="col-span-1 bg-white h-[400px]">
+          <div className="col-span-1 bg-white rounded-xl shadow-sm pb-[var(--spacing-y)]">
             <div name="title-subtitle" className="ml-[var(--spacing-x)] mt-[var(--spacing-y)]">
               <div name="title" className="font-bold">
                 {t('sensor.light')}
               </div>
               <div name="subtitle">{t('sensor.sourceLight')}</div>
             </div>
-            <div className="w-[300px] h-[300px] mx-auto mt-[var(--spacing-y)]">
+            <div className="w-[300px] mx-auto mt-[var(--spacing-y)]">
               <div className="flex flex-col justify-center items-center">
                 {lightLoading ? (
-                  <div className="md:w-[650px] xl:w-[700px] 2xl:w-[900px] h-[800px] text-center leading-[200px]">
+                  <div className="w-[250px] h-[250px] flex items-center justify-center">
                     <CircularProgress
                       variant="indeterminate"
                       value={50}
@@ -725,17 +725,17 @@ export default function LastValues(props) {
               </div>
             </div>
           </div>
-          <div className="col-span-1 bg-white h-[400px]">
+          <div className="col-span-1 bg-white rounded-xl shadow-sm pb-[var(--spacing-y)]">
             <div name="title-subtitle" className="ml-[var(--spacing-x)] mt-[var(--spacing-y)]">
               <div name="title" className="font-bold">
                 {t('sensor.airHumidity')}
               </div>
               <div name="subtitle">{t('sensor.sourceAirHumidity')}</div>
             </div>
-            <div className="w-[300px] h-[300px] mx-auto mt-[var(--spacing-y)]">
+            <div className="w-[300px] mx-auto mt-[var(--spacing-y)]">
               <div className="flex flex-col justify-center items-center">
                 {humidLoading ? (
-                  <div className="md:w-[650px] xl:w-[700px] 2xl:w-[900px] h-[800px] text-center leading-[200px]">
+                  <div className="w-[250px] h-[250px] flex items-center justify-center">
                     <CircularProgress
                       variant="indeterminate"
                       value={50}
@@ -945,17 +945,17 @@ export default function LastValues(props) {
               </div>
             </div>
           </div>
-          <div className="col-span-1 bg-white h-[400px]">
+          <div className="col-span-1 bg-white rounded-xl shadow-sm pb-[var(--spacing-y)]">
             <div name="title-subtitle" className="ml-[var(--spacing-x)] mt-[var(--spacing-y)]">
               <div name="title" className="font-bold">
                 {t('sensor.soilMoisture')}
               </div>
               <div name="subtitle">{t('sensor.sourceSoilMoisture')}</div>
             </div>
-            <div className="w-[300px] h-[300px] mx-auto mt-[var(--spacing-y)]">
+            <div className="w-[300px] mx-auto mt-[var(--spacing-y)]">
               <div className="flex flex-col justify-center items-center">
                 {moistureLoading ? (
-                  <div className="md:w-[650px] xl:w-[700px] 2xl:w-[900px] h-[800px] text-center leading-[200px]">
+                  <div className="w-[250px] h-[250px] flex items-center justify-center">
                     <CircularProgress
                       variant="indeterminate"
                       value={50}

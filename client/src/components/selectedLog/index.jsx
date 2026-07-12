@@ -65,27 +65,23 @@ export default function SeHistory() {
         fetchData();
     }, [navigate, sessionID, value]);
     return (
-        <div className="flex justify-center pt-[var(--spacing-section)] gap-x-[var(--spacing-x)] gap-y-[var(--spacing-y)]">
-            <div className="flex-grow w-30 pl-[var(--spacing-section)] w-full max-w-[200px] md:max-w-[450px]">
-                <Calendar onChange={GetDate} value={value} />
+        <div className="flex flex-col md:flex-row md:items-start justify-center gap-[var(--spacing-section)] pt-[var(--spacing-section)] px-[var(--spacing-body)]">
+            <div className="w-full max-w-[360px] bg-white rounded-xl shadow-sm p-[var(--spacing-y)]">
+                <Calendar onChange={GetDate} value={value} className="app-calendar" />
             </div>
-            <div className="flex-grow md:w-[600px] xl:max-w-[750px] 2xl:w-[900px] h-[400px] bg-white p-[var(--spacing-y)] overflow-auto" >
-                <p className="font-bold 2xl:text-xl">{t('log.title')}</p>
-                <hr className="h-px my-[var(--spacing-x)] bg-black border-0"></hr>
+            <div className="w-full md:flex-1 md:max-w-[760px] h-[450px] bg-white rounded-xl shadow-sm p-[var(--spacing-section)] overflow-auto">
+                <p className="font-bold text-textGray 2xl:text-xl">{t('log.title')}</p>
+                <hr className="h-px my-[var(--spacing-x)] bg-gray-200 border-0" />
                 <div>
                     {logData.length === 0 ? (
-                        <p className="py-[var(--spacing-x)] xl:text-base 2xl:text-lg">{t('log.noDateData')}</p>
+                        <p className="py-[var(--spacing-x)] text-textGray xl:text-base 2xl:text-lg">{t('log.noDateData')}</p>
                     ) : (
                         logData.map((item,index)=>(
-                            <p key={index} className="py-[var(--spacing-x)] xl:text-base 2xl:text-lg"> {item.time}: {item.activity} </p>
+                            <p key={index} className="py-[var(--spacing-x)] text-textGray xl:text-base 2xl:text-lg"> {item.time}: {item.activity} </p>
                         ))
                     )}
                 </div>
             </div>
-            <div className="flex-grow">
-            </div>
         </div>
-
-
     );
 }
