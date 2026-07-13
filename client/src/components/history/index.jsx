@@ -51,8 +51,16 @@ export default function History(props) {
   }, [navigate, sessionID, t]);
   return (
     <div
-      className={`md:w-[280px] xl:w-[400px] 2xl:w-[400px] h-[400px] ${classes.panel} p-[var(--spacing-y)] overflow-auto`}
+      role="button"
+      tabIndex={0}
+      className={`md:w-[280px] xl:w-[400px] 2xl:w-[400px] h-[400px] ${classes.panel} p-[var(--spacing-y)] overflow-auto cursor-pointer`}
       onClick={() => navigate("/log")}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          navigate("/log");
+        }
+      }}
     >
       <p className="font-bold">{t('log.title')}</p>
       <hr className="h-px my-[var(--spacing-x)] bg-black border-0"></hr>

@@ -25,15 +25,17 @@ app.use(cookieParser())
 // const server = createServer(app)
 // const io = new Server(server)
 const port = 3001
-const allowedOrigins = (process.env.CLIENT_ORIGINS || 'http://localhost:3000,http://127.0.0.1:3000')
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean)
+const allowedOrigins = new Set(
+  (process.env.CLIENT_ORIGINS || 'http://localhost:3000,http://127.0.0.1:3000')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+)
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.has(origin)) {
         callback(null, true)
         return
       }
@@ -92,5 +94,5 @@ export async function start () {
 // not when it is imported by tests via supertest.
 const isDirectRun = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]
 if (isDirectRun) {
-  start()
+  await start()
 }

@@ -17,7 +17,7 @@ function formatTime(dateString) {
 export default function SeHistory() {
     const sessionID = localStorage.getItem('sessionID');
     const [logData, setlogData] = useState([]);
-    const [value, GetDate] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const hasLoadedInitialDate = useRef(false);
     const navigate = useNavigate();
     const { t } = useI18n();
@@ -34,7 +34,7 @@ export default function SeHistory() {
 					navigate('/login');
 				}
                 else{
-                    const newDate = new Date(value);
+                    const newDate = new Date(selectedDate);
                     if (hasLoadedInitialDate.current){
                         newDate.setDate(newDate.getDate() + 1);
                     }
@@ -64,11 +64,11 @@ export default function SeHistory() {
             }
         };
         fetchData();
-    }, [navigate, sessionID, t, value]);
+    }, [navigate, sessionID, t, selectedDate]);
     return (
         <div className="flex flex-col md:flex-row md:items-start justify-center gap-[var(--spacing-section)] pt-[var(--spacing-section)] px-[var(--spacing-body)]">
             <div className={`w-full max-w-[360px] ${classes.panel} p-[var(--spacing-y)]`}>
-                <Calendar onChange={GetDate} value={value} className="app-calendar" />
+                <Calendar onChange={setSelectedDate} value={selectedDate} className="app-calendar" />
             </div>
             <div className={`w-full md:flex-1 md:max-w-[760px] h-[450px] ${classes.panel} p-[var(--spacing-section)] overflow-auto`}>
                 <p className="font-bold text-textGray 2xl:text-xl">{t('log.title')}</p>

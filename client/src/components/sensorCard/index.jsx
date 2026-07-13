@@ -15,6 +15,13 @@ function arcRotation(percent) {
 // in-range, above-upper) over three grey track segments. `av`/`al`/`au` are the
 // value / lower / upper expressed as a percentage of the ring (0–100).
 function GaugeArcs({ av, al, au, color }) {
+  // Length of the in-range (middle) coloured segment.
+  let inRangeValue = 0;
+  if (av > au) {
+    inRangeValue = au - al - 0.4;
+  } else if (av > al) {
+    inRangeValue = av - al - 0.4;
+  }
   return (
     <>
       <CircularProgress
@@ -27,7 +34,7 @@ function GaugeArcs({ av, al, au, color }) {
       />
       <CircularProgress
         variant="determinate"
-        value={av > au ? au - al - 0.4 : av > al ? av - al - 0.4 : 0}
+        value={inRangeValue}
         size={GAUGE_SIZE}
         thickness={GAUGE_THICKNESS}
         color={color}

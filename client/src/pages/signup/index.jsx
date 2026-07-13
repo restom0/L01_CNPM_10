@@ -15,42 +15,36 @@ export default function Signup() {
     const [aioKey, setAioKey] = useState('');
     const navigate = useNavigate();
     const { t } = useI18n();
-    const handleRegister = async () => { 
+    const getValidationErrorKey = () => {
+        if (username === '') return 'error.usernameRequired';
+        if (password === '') return 'error.passwordRequired';
+        if (mqttUsername === '') return 'error.mqttUsernameRequired';
+        if (aioKey === '') return 'error.aioKeyRequired';
+        if (password !== rePassword) return 'error.passwordMismatch';
+        return null;
+    };
+    const handleRegister = async () => {
+        const validationErrorKey = getValidationErrorKey();
+        if (validationErrorKey) {
+            alert(t(validationErrorKey));
+            return;
+        }
         try {
-            if (username === ''){
-                alert(t('error.usernameRequired'))
+            const registerResponse = await axios.post('http://localhost:3001/register', { username, password, mqttUsername, aioKey });
+            if (registerResponse.data.data === "Register successfully") {
+                alert(t('register.success'));
+                setTimeout(() => {
+                    navigate('/login');
+                }, 100);
             }
-            else if (password === ''){
-                alert(t('error.passwordRequired'))
-            }
-            else if (mqttUsername === '') {
-                alert(t('error.mqttUsernameRequired'))
-            }
-            else if (aioKey === '') {
-                alert(t('error.aioKeyRequired'))
-            }
-            else if (password !== rePassword){
-                alert(t('error.passwordMismatch'));
-            }
-            else{
-                const registerResponse = await axios.post('http://localhost:3001/register',{username: username,password: password,mqttUsername: mqttUsername,aioKey: aioKey});
-                if (registerResponse.data.data === "Register successfully"){
-                    alert(t('register.success'));
-                    setTimeout(() => {
-                        navigate('/login');
-                    }, 100);
-                }
-            }
-        }catch (error) {
+        } catch (error) {
             if (error.response?.status === 400) {
-                if (error.response?.data?.error === "Account existed"){
-                    alert(t('error.accountExists'))
-                }
-                else{
+                if (error.response?.data?.error === "Account existed") {
+                    alert(t('error.accountExists'));
+                } else {
                     alert(t('error.badRequest'));
                 }
-            }
-            else{
+            } else {
                 alert(getTranslatedApiErrorMessage(t, error));
             }
         }
