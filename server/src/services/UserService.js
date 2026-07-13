@@ -3,22 +3,29 @@ import { UserModel } from '../models/Users.js'
 import { Types } from 'mongoose'
 
 const login = async (inputUserName, inputPassword) => {
-  // Reject non-string input so a crafted object like {$ne: null} can't reach the
-  // query and inject Mongo operators (NoSQL injection). The typeof guard narrows
-  // both values to strings before they are used in findOne.
-  if (typeof inputUserName !== 'string' || typeof inputPassword !== 'string') {
-    throw new BadRequestError('Username and password must be strings')
+  // Reject non-string input (one guard per value, so each is individually
+  // narrowed to a string) before it reaches the query — a crafted object like
+  // {$ne: null} can't then inject Mongo operators (NoSQL injection).
+  if (typeof inputUserName !== 'string') {
+    throw new BadRequestError('Username must be a string')
+  }
+  if (typeof inputPassword !== 'string') {
+    throw new BadRequestError('Password must be a string')
   }
   return await UserModel.findOne({ username: inputUserName, password: inputPassword }).exec()
 }
 const register = async (username, password, mqttUsername, aioKey) => {
-  if (
-    typeof username !== 'string' ||
-    typeof password !== 'string' ||
-    typeof mqttUsername !== 'string' ||
-    typeof aioKey !== 'string'
-  ) {
-    throw new BadRequestError('All fields must be strings')
+  if (typeof username !== 'string') {
+    throw new BadRequestError('Username must be a string')
+  }
+  if (typeof password !== 'string') {
+    throw new BadRequestError('Password must be a string')
+  }
+  if (typeof mqttUsername !== 'string') {
+    throw new BadRequestError('Mqtt username must be a string')
+  }
+  if (typeof aioKey !== 'string') {
+    throw new BadRequestError('Key must be a string')
   }
   if (await UserModel.findOne({ username })) {
     throw new BadRequestError('Account existed')
