@@ -2,6 +2,7 @@ import express, { json } from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
 import bodyParser from 'body-parser'
+import cookieParser from 'cookie-parser'
 import rateLimit from 'express-rate-limit'
 // import { createServer } from 'node:http'
 // import { Server } from 'socket.io'
@@ -20,6 +21,7 @@ export const app = express()
 app.disable('x-powered-by')
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
+app.use(cookieParser())
 // const server = createServer(app)
 // const io = new Server(server)
 const port = 3001

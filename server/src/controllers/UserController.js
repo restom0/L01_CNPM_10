@@ -17,10 +17,21 @@ const login = async (req, res) => {
     if (CommonUtils.checkNullOrUndefined(result)) {
       throw new NotFoundError('Username or password is incorrect')
     }
-    res.status(200).json({ api_token: createApiKey(result._id) })
+    const token = createApiKey(result._id)
+    res.cookie('token', token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 8 * 60 * 60 * 1000
+    })
+    res.status(200).json({ api_token: token })
   } catch (error) {
     res.status(error.statusCode).json({ error: error.message })
   }
+}
+const logout = async (req, res) => {
+  res.clearCookie('token')
+  res.status(200).json({ data: 'Logged out' })
 }
 const register = async (req, res) => {
   try {
@@ -41,4 +52,4 @@ const register = async (req, res) => {
     res.status(error.statusCode).json({ error: error.message })
   }
 }
-export const UserController = { login, register }
+export const UserController = { login, register, logout }

@@ -1,4 +1,5 @@
 import React from 'react'
+import axios from 'axios'
 import classNames from 'classnames'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { HiHome, HiChartBar, HiLogout} from 'react-icons/hi'
@@ -62,8 +63,13 @@ const linkClass =
 export default function Sidebar() {
 	const { t } = useI18n();
 	const navigate = useNavigate();
-	const handleLogout = async () => { 
+	const handleLogout = async () => {
         try {
+            try {
+                await axios.post('http://localhost:3001/logout');
+            } catch {
+                // Offline/demo mode has no backend; clearing the local marker is enough.
+            }
             localStorage.removeItem('sessionID');
             navigate('/login');
         }catch (error) {

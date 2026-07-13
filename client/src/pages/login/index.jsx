@@ -28,8 +28,10 @@ export default function Login() {
                 navigate('/dashboard');
             }
             else {
-                const loginResponse = await axios.post(`http://localhost:3001/login`,{username: username,password: password});
-                localStorage.setItem('sessionID', loginResponse.data.api_token);
+                await axios.post(`http://localhost:3001/login`, { username, password });
+                // The JWT is set by the server in an httpOnly cookie; keep only a
+                // non-sensitive marker so client-side route guards know we're in.
+                localStorage.setItem('sessionID', 'authenticated');
                 navigate('/dashboard');
             }
         }catch (error) {

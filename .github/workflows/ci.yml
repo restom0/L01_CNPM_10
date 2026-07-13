@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
 
+# Least privilege: the jobs only check out and build/test, no writes needed.
+permissions:
+  contents: read
+
 # Cancel superseded runs on the same ref to save minutes.
 concurrency:
   group: ci-${{ github.ref }}

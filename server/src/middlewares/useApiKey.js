@@ -21,10 +21,14 @@ export const createApiKey = (data) => {
 }
 export const requireApiKey = async (req, res, next) => {
   try {
-    if (CommonUtils.checkNullOrUndefined(req.headers.authorization)) {
+    // Prefer the httpOnly cookie; fall back to the Authorization header for
+    // API clients / tests that still send a Bearer token.
+    const apiKey =
+      req.cookies?.token ??
+      (req.headers.authorization ? req.headers.authorization.split(' ')[1] : null)
+    if (CommonUtils.checkNullOrUndefined(apiKey)) {
       throw new UnAuthorizedError('You need to login')
     }
-    const apiKey = req.headers.authorization.split(' ')[1]
     jwt.verify(apiKey, JWT_SECRET, async (err, decoded) => {
       if (err || !decoded) {
         const exception = new ForbiddenRequestError('Invalid access')
@@ -34,6 +38,7 @@ export const requireApiKey = async (req, res, next) => {
         if (CommonUtils.checkNullOrUndefined(result)) {
           const exception = new NotFoundError('Invalid access')
           res.status(exception.statusCode).send({ message: exception.message })
+          return
         }
         req.user = {
           id: Types.ObjectId.createFromHexString(decoded.data),
