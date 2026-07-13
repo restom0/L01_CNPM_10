@@ -17,13 +17,26 @@ import { requireApiKey } from './src/middlewares/useApiKey.js'
 import cron from 'node-cron'
 import { fileURLToPath } from 'node:url'
 export const app = express()
+app.disable('x-powered-by')
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 // const server = createServer(app)
 // const io = new Server(server)
 const port = 3001
+const allowedOrigins = (process.env.CLIENT_ORIGINS || 'http://localhost:3000,http://127.0.0.1:3000')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean)
+
 app.use(
   cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true)
+        return
+      }
+      callback(new Error('Origin not allowed by CORS'))
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true
   })

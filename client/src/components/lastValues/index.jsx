@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { CircularProgress, TextField } from "@mui/material";
+import SensorCard from "../sensorCard";
 import TemperatureCelsiusGood from "../../assets/images/temperature-celsius-good.svg";
 import TemperatureCelsiusWarning from "../../assets/images/temperature-celsius-warning.svg";
 import LightIntensityGood from "../../assets/images/light-intensity-good.svg";
@@ -11,32 +11,8 @@ import SoilMoistureGood from "../../assets/images/soil-moisture-good.svg";
 import AirHumidityWarning from "../../assets/images/air-humidity-warning.svg";
 import AirHumidityGood from "../../assets/images/air-humidity-good.svg";
 import { DUMMY_SENSOR_RESPONSES } from "../../data/dummyData";
-import { getApiErrorMessage, isUnauthorized } from "../../utils/apiError";
+import { getTranslatedApiErrorMessage, isUnauthorized } from "../../utils/apiError";
 import { useI18n } from "../../i18n";
-
-function formatDateInfo(inputTime) {
-  // const date = new Date(inputTime);
-  // const today = new Date();
-  // const yesterday = new Date(today);
-  // yesterday.setDate(yesterday.getDate() - 1);
-
-  // const isToday = date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
-  // const isYesterday = date.getDate() === yesterday.getDate() && date.getMonth() === yesterday.getMonth() && date.getFullYear() === yesterday.getFullYear();
-
-  // if (isToday) {
-  //     return `Hôm nay lúc ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-  // } else if (isYesterday) {
-  //     return `Hôm qua lúc ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-  // } else {
-  //     const day = date.getDate().toString().padStart(2, '0');
-  //     const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  //     const year = date.getFullYear();
-  //     const hours = date.getHours().toString().padStart(2, '0');
-  //     const minutes = date.getMinutes().toString().padStart(2, '0');
-  //     return `${day}/${month}/${year} lúc ${hours}:${minutes}`;
-  // }
-  return inputTime;
-}
 
 function formatTime(inputTime) {
   const date = new Date(inputTime);
@@ -52,7 +28,7 @@ function formatTime(inputTime) {
 
 function toSensorInfo(response) {
   return {
-    value: parseFloat(response.data.value),
+    value: Number.parseFloat(response.data.value),
     time: formatTime(response.data.created_at),
     lowerThreshold: response.lower,
     upperThreshold: response.upper,
@@ -69,6 +45,19 @@ function toLightInfo(response) {
   };
 }
 
+// Gauge arc inputs: most sensors plot the raw value/thresholds (already 0–100);
+// light is scaled to a percentage of its 0–10000 lux range.
+const rawArc = (info) => ({
+  value: info.value,
+  lower: info.lowerThreshold,
+  upper: info.upperThreshold,
+});
+const lightArc = (info) => ({
+  value: info.valuePercent,
+  lower: info.lowerThresholdPercent,
+  upper: info.upperThresholdPercent,
+});
+
 export default function LastValues(props) {
   const [tempInfo, setTempInfo] = useState(null);
   const [lightInfo, setLightInfo] = useState(null);
@@ -78,17 +67,16 @@ export default function LastValues(props) {
   const [lightLoading, setLightLoading] = useState(true);
   const [humidLoading, setHumidLoading] = useState(true);
   const [moistureLoading, setMoistureLoading] = useState(true);
-  const [EDLoading, setEDLoading] = useState(true);
   const navigate = useNavigate();
   const sessionID = props.api_token;
   const { t } = useI18n();
 
   const setSensorLoading = (sensor, value) => {
-    if (sensor == "temp") {
+    if (sensor === "temp") {
       setTempLoading(value);
-    } else if (sensor == "light") {
+    } else if (sensor === "light") {
       setLightLoading(value);
-    } else if (sensor == "humid") {
+    } else if (sensor === "humid") {
       setHumidLoading(value);
     } else {
       setMoistureLoading(value);
@@ -129,7 +117,7 @@ export default function LastValues(props) {
         setMoistureLoading(false);
       } catch (error) {
         if (isUnauthorized(error)) {
-          alert("Error: " + getApiErrorMessage(error));
+          alert(getTranslatedApiErrorMessage(t, error));
           navigate("/login");
         } else {
           setTempInfo(toSensorInfo(DUMMY_SENSOR_RESPONSES.temp));
@@ -152,17 +140,12 @@ export default function LastValues(props) {
             Authorization: "Bearer " + sessionID,
           },
         };
-        const EDResponse = await axios.get(
-          `http://localhost:3001/sensors/ed`,
-          config
-        );
-        setEDLoading(false);
+        await axios.get(`http://localhost:3001/sensors/ed`, config);
       } catch (error) {
         if (isUnauthorized(error)) {
-          alert("Error: " + getApiErrorMessage(error));
+          alert(getTranslatedApiErrorMessage(t, error));
           navigate("/login");
         } else {
-          setEDLoading(false);
           console.error("Error fetching data:", error);
         }
       }
@@ -177,7 +160,7 @@ export default function LastValues(props) {
       clearInterval(otherIntervalId);
       clearInterval(EDintervalId);
     };
-  }, [navigate, sessionID]);
+  }, [navigate, sessionID, t]);
 
   function handleKeyDown(e, sensor) {
     if (e.key === "Enter") {
@@ -189,17 +172,19 @@ export default function LastValues(props) {
               Authorization: "Bearer " + sessionID,
             },
           };
-          var lower, upper, api_url;
+          let lower;
+          let upper;
+          let apiUrl;
 
-          if (sensor == "temp") {
+          if (sensor === "temp") {
             setTempLoading(true);
             lower = tempInfo.lowerThreshold;
             upper = tempInfo.upperThreshold;
-          } else if (sensor == "light") {
+          } else if (sensor === "light") {
             setLightLoading(true);
             lower = lightInfo.lowerThreshold;
             upper = lightInfo.upperThreshold;
-          } else if (sensor == "humid") {
+          } else if (sensor === "humid") {
             setHumidLoading(true);
             lower = humidInfo.lowerThreshold;
             upper = humidInfo.upperThreshold;
@@ -209,22 +194,22 @@ export default function LastValues(props) {
             upper = moistureInfo.upperThreshold;
           }
 
-          if (lower == "" && upper == "") {
-            api_url = `http://localhost:3001/sensors/threshold/` + sensor + "?";
-          } else if (lower == "") {
-            api_url =
+          if (lower === "" && upper === "") {
+            apiUrl = `http://localhost:3001/sensors/threshold/` + sensor + "?";
+          } else if (lower === "") {
+            apiUrl =
               `http://localhost:3001/sensors/threshold/` +
               sensor +
               "?upper=" +
               upper;
-          } else if (upper == "") {
-            api_url =
+          } else if (upper === "") {
+            apiUrl =
               `http://localhost:3001/sensors/threshold/` +
               sensor +
               "?lower=" +
               lower;
           } else {
-            api_url =
+            apiUrl =
               `http://localhost:3001/sensors/threshold/` +
               sensor +
               "?upper=" +
@@ -233,942 +218,110 @@ export default function LastValues(props) {
               lower;
           }
 
-          await axios.put(api_url, {}, config);
+          await axios.put(apiUrl, {}, config);
           setSensorLoading(sensor, false);
-
-          // if (sensor == 'temp') {
-          //     setTempLoading(false);
-          // }
-          // else if (sensor == 'light') {
-          //     setLightLoading(false);
-          // }
-          // else if (sensor == 'humid') {
-          //     setHumidLoading(false);
-          // }
-          // else {
-          //     setMoistureLoading(false);
-          // }
         } catch (error) {
           if (isUnauthorized(error)) {
-            alert("Error: " + getApiErrorMessage(error));
+            alert(getTranslatedApiErrorMessage(t, error));
             navigate("/login");
           } else {
             setSensorLoading(sensor, false);
             console.error("Error fetching data:", error);
           }
         }
-        // } finally {
-        //     if (sensor == 'temp') {
-        //         setTempLoading(false);
-        //     }
-        //     else if (sensor == 'light') {
-        //         setLightLoading(false);
-        //     }
-        //     else if (sensor == 'humid') {
-        //         setHumidLoading(false);
-        //     }
-        //     else {
-        //         setMoistureLoading(false);
-        //     }
-        // }
       };
 
       updateThreshold();
     }
   }
 
+  const onThresholdChange = (setInfo, info, field) => (e) =>
+    setInfo({
+      ...info,
+      [field]: e.target.value !== "" ? Number.parseFloat(e.target.value) : "",
+    });
+
+  const sensors = [
+    {
+      key: "temp",
+      title: t("sensor.temperature"),
+      subtitle: t("sensor.sourceTemperature"),
+      info: tempInfo,
+      loading: tempLoading,
+      setInfo: setTempInfo,
+      unit: "°C",
+      iconGood: TemperatureCelsiusGood,
+      iconWarn: TemperatureCelsiusWarning,
+      normalKey: "sensor.temperatureNormal",
+      warnKey: "sensor.temperatureOutOfRange",
+      arc: rawArc,
+    },
+    {
+      key: "light",
+      title: t("sensor.light"),
+      subtitle: t("sensor.sourceLight"),
+      info: lightInfo,
+      loading: lightLoading,
+      setInfo: setLightInfo,
+      unit: "lux",
+      iconGood: LightIntensityGood,
+      iconWarn: LightIntensityWarning,
+      normalKey: "sensor.lightNormal",
+      warnKey: "sensor.lightOutOfRange",
+      arc: lightArc,
+    },
+    {
+      key: "humid",
+      title: t("sensor.airHumidity"),
+      subtitle: t("sensor.sourceAirHumidity"),
+      info: humidInfo,
+      loading: humidLoading,
+      setInfo: setHumidInfo,
+      unit: "%",
+      iconGood: AirHumidityGood,
+      iconWarn: AirHumidityWarning,
+      normalKey: "sensor.humidityNormal",
+      warnKey: "sensor.humidityOutOfRange",
+      arc: rawArc,
+    },
+    {
+      key: "moisture",
+      title: t("sensor.soilMoisture"),
+      subtitle: t("sensor.sourceSoilMoisture"),
+      info: moistureInfo,
+      loading: moistureLoading,
+      setInfo: setMoistureInfo,
+      unit: "%",
+      iconGood: SoilMoistureGood,
+      iconWarn: SoilMoistureWarning,
+      normalKey: "sensor.humidityNormal",
+      warnKey: "sensor.humidityOutOfRange",
+      arc: rawArc,
+    },
+  ];
+
   return (
     <div>
       <div className="md:w-[650px] xl:w-[700px] 2xl:w-[900px]">
         <div className="grid grid-cols-2 gap-x-[var(--spacing-x)] gap-y-[var(--spacing-y)] w-full">
-          <div className="col-span-1 bg-white rounded-xl shadow-sm pb-[var(--spacing-y)]">
-            <div name="title-subtitle" className="ml-[var(--spacing-x)] mt-[var(--spacing-y)]">
-              <div name="title" className="font-bold">
-                {t('sensor.temperature')}
-              </div>
-              <div name="subtitle">{t('sensor.sourceTemperature')}</div>
-            </div>
-            <div className="w-[300px] mx-auto mt-[var(--spacing-y)]">
-              <div className="flex flex-col justify-center items-center">
-                {tempLoading ? (
-                  <div className="w-[250px] h-[250px] flex items-center justify-center">
-                    <CircularProgress
-                      variant="indeterminate"
-                      value={50}
-                      size={50}
-                      thickness={3}
-                    />
-                  </div>
-                ) : (
-                  <div className="relative inline-flex">
-                    <CircularProgress
-                      variant="determinate"
-                      value={
-                        tempInfo.value < tempInfo.lowerThreshold
-                          ? tempInfo.value
-                          : tempInfo.lowerThreshold - 0.1
-                      }
-                      size={250}
-                      thickness={3}
-                      color={tempInfo.needNoti ? "warning" : "success"}
-                      style={{
-                        transform: "rotate(90deg)",
-                        zIndex: 2,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={
-                        tempInfo.value > tempInfo.upperThreshold
-                          ? tempInfo.upperThreshold -
-                            tempInfo.lowerThreshold -
-                            0.4
-                          : tempInfo.value > tempInfo.lowerThreshold
-                            ? tempInfo.value - tempInfo.lowerThreshold - 0.4
-                            : 0
-                      }
-                      size={250}
-                      thickness={3}
-                      color={tempInfo.needNoti ? "warning" : "success"}
-                      style={{
-                        transform:
-                          "rotate(" +
-                          (Math.floor(
-                            90 + (tempInfo.lowerThreshold * 360) / 100
-                          ) +
-                            1) +
-                          "deg)",
-                        position: "absolute",
-                        zIndex: 2,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={
-                        tempInfo.value > tempInfo.upperThreshold
-                          ? tempInfo.value - tempInfo.upperThreshold - 0.4
-                          : 0
-                      }
-                      size={250}
-                      thickness={3}
-                      color={tempInfo.needNoti ? "warning" : "success"}
-                      style={{
-                        transform:
-                          "rotate(" +
-                          (Math.floor(
-                            90 + (tempInfo.upperThreshold * 360) / 100
-                          ) +
-                            1) +
-                          "deg)",
-                        position: "absolute",
-                        zIndex: 2,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={tempInfo.lowerThreshold - 0.01}
-                      size={250}
-                      thickness={3}
-                      style={{
-                        color: "lightGray",
-                        transform: "rotate(90deg)",
-                        position: "absolute",
-                        zIndex: 1,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={
-                        tempInfo.upperThreshold - tempInfo.lowerThreshold - 0.4
-                      }
-                      size={250}
-                      thickness={3}
-                      style={{
-                        color: "lightGray",
-                        transform:
-                          "rotate(" +
-                          (Math.floor(
-                            90 + (tempInfo.lowerThreshold * 360) / 100
-                          ) +
-                            1) +
-                          "deg)",
-                        position: "absolute",
-                        zIndex: 1,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={100 - tempInfo.upperThreshold - 0.4}
-                      size={250}
-                      thickness={3}
-                      style={{
-                        color: "lightGray",
-                        transform:
-                          "rotate(" +
-                          (Math.floor(
-                            90 + (tempInfo.upperThreshold * 360) / 100
-                          ) +
-                            1) +
-                          "deg)",
-                        position: "absolute",
-                        zIndex: 1,
-                      }}
-                    />
-                    <div className="w-full h-full rounded-full bg-lightGray z-0 absolute"></div>
-                    <div className="flex top-0 left-0 bottom-0 right-0 absolute justify-center items-center">
-                      <div className="flex flex-col justify-center items-center">
-                        <img
-                          alt=""
-                          src={
-                            tempInfo.needNoti
-                              ? TemperatureCelsiusWarning
-                              : TemperatureCelsiusGood
-                          }
-                        />
-                        <div
-                          className={
-                            "font-bold text-[1.5rem] text-center" +
-                            (tempInfo.needNoti
-                              ? " text-warning"
-                              : " text-success")
-                          }
-                        >
-                          {tempInfo.value} °C
-                          <div className="font-normal text-[1rem]">
-                            {tempInfo.needNoti
-                              ? t('sensor.temperatureOutOfRange')
-                              : t('sensor.temperatureNormal')}
-                          </div>
-                        </div>
-                        <div>{formatDateInfo(tempInfo.time)}</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div name="threshold" className="mx-[var(--spacing-x)] mt-[var(--spacing-y)]">
-                <div className="float-left">
-                  {t('common.lowerThreshold')}
-                  {tempLoading ? (
-                    <div></div>
-                  ) : (
-                    <div className="mx-auto w-[96px] h-[44px]">
-                      <input
-                        type="number"
-                        className="bg-mainRed text-center rounded-full w-full h-full text-white"
-                        value={tempInfo.lowerThreshold}
-                        onChange={(e) =>
-                          setTempInfo({
-                            ...tempInfo,
-                            lowerThreshold:
-                              e.target.value != ""
-                                ? parseFloat(e.target.value)
-                                : "",
-                          })
-                        }
-                        onKeyDown={(e) => handleKeyDown(e, "temp")}
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="float-right">
-                  {t('common.upperThreshold')}
-                  {tempLoading ? (
-                    <div></div>
-                  ) : (
-                    <div className="mx-auto w-[96px] h-[44px]">
-                      <input
-                        type="number"
-                        className="bg-mainRed text-center rounded-full w-full h-full text-white"
-                        value={tempInfo.upperThreshold}
-                        // onChange={(e) => setTempInfo({ ...tempInfo, upperThreshold: (e.target.value != '') ? parseFloat(e.target.value) : ''})}
-                        onChange={(e) =>
-                          setTempInfo({
-                            ...tempInfo,
-                            upperThreshold:
-                              e.target.value != ""
-                                ? parseFloat(e.target.value)
-                                : "",
-                          })
-                        }
-                        onKeyDown={(e) => handleKeyDown(e, "temp")}
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="clear-both"></div>
-              </div>
-            </div>
-          </div>
-          <div className="col-span-1 bg-white rounded-xl shadow-sm pb-[var(--spacing-y)]">
-            <div name="title-subtitle" className="ml-[var(--spacing-x)] mt-[var(--spacing-y)]">
-              <div name="title" className="font-bold">
-                {t('sensor.light')}
-              </div>
-              <div name="subtitle">{t('sensor.sourceLight')}</div>
-            </div>
-            <div className="w-[300px] mx-auto mt-[var(--spacing-y)]">
-              <div className="flex flex-col justify-center items-center">
-                {lightLoading ? (
-                  <div className="w-[250px] h-[250px] flex items-center justify-center">
-                    <CircularProgress
-                      variant="indeterminate"
-                      value={50}
-                      size={50}
-                      thickness={3}
-                    />
-                  </div>
-                ) : (
-                  <div className="relative inline-flex">
-                    <CircularProgress
-                      variant="determinate"
-                      value={
-                        lightInfo.valuePercent < lightInfo.lowerThresholdPercent
-                          ? lightInfo.valuePercent
-                          : lightInfo.lowerThresholdPercent - 0.1
-                      }
-                      size={250}
-                      thickness={3}
-                      color={lightInfo.needNoti ? "warning" : "success"}
-                      style={{
-                        transform: "rotate(90deg)",
-                        zIndex: 2,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={
-                        lightInfo.valuePercent > lightInfo.upperThresholdPercent
-                          ? lightInfo.upperThresholdPercent -
-                            lightInfo.lowerThresholdPercent -
-                            0.4
-                          : lightInfo.valuePercent >
-                              lightInfo.lowerThresholdPercent
-                            ? lightInfo.valuePercent -
-                              lightInfo.lowerThresholdPercent -
-                              0.4
-                            : 0
-                      }
-                      size={250}
-                      thickness={3}
-                      color={lightInfo.needNoti ? "warning" : "success"}
-                      style={{
-                        transform:
-                          "rotate(" +
-                          (Math.floor(
-                            90 + (lightInfo.lowerThresholdPercent * 360) / 100
-                          ) +
-                            1) +
-                          "deg)",
-                        position: "absolute",
-                        zIndex: 2,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={
-                        lightInfo.valuePercent > lightInfo.upperThresholdPercent
-                          ? lightInfo.valuePercent -
-                            lightInfo.upperThresholdPercent -
-                            0.4
-                          : 0
-                      }
-                      size={250}
-                      thickness={3}
-                      color={lightInfo.needNoti ? "warning" : "success"}
-                      style={{
-                        transform:
-                          "rotate(" +
-                          (Math.floor(
-                            90 + (lightInfo.upperThresholdPercent * 360) / 100
-                          ) +
-                            1) +
-                          "deg)",
-                        position: "absolute",
-                        zIndex: 2,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={lightInfo.lowerThresholdPercent - 0.01}
-                      size={250}
-                      thickness={3}
-                      style={{
-                        color: "lightGray",
-                        transform: "rotate(90deg)",
-                        position: "absolute",
-                        zIndex: 1,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={
-                        lightInfo.upperThresholdPercent -
-                        lightInfo.lowerThresholdPercent -
-                        0.4
-                      }
-                      size={250}
-                      thickness={3}
-                      style={{
-                        color: "lightGray",
-                        transform:
-                          "rotate(" +
-                          (Math.floor(
-                            90 + (lightInfo.lowerThresholdPercent * 360) / 100
-                          ) +
-                            1) +
-                          "deg)",
-                        position: "absolute",
-                        zIndex: 1,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={100 - lightInfo.upperThresholdPercent - 0.4}
-                      size={250}
-                      thickness={3}
-                      style={{
-                        color: "lightGray",
-                        transform:
-                          "rotate(" +
-                          (Math.floor(
-                            90 + (lightInfo.upperThresholdPercent * 360) / 100
-                          ) +
-                            1) +
-                          "deg)",
-                        position: "absolute",
-                        zIndex: 1,
-                      }}
-                    />
-                    <div className="w-full h-full rounded-full bg-lightGray z-0 absolute"></div>
-                    <div className="flex top-0 left-0 bottom-0 right-0 absolute justify-center items-center">
-                      <div className="flex flex-col justify-center items-center">
-                        <img
-                          alt=""
-                          src={
-                            lightInfo.needNoti
-                              ? LightIntensityWarning
-                              : LightIntensityGood
-                          }
-                        />
-                        <div
-                          className={
-                            "font-bold text-[1.5rem] text-center" +
-                            (lightInfo.needNoti
-                              ? " text-warning"
-                              : " text-success")
-                          }
-                        >
-                          {lightInfo.value} lux
-                          <div className="font-normal text-[1rem]">
-                            {lightInfo.needNoti
-                              ? t('sensor.lightOutOfRange')
-                              : t('sensor.lightNormal')}
-                          </div>
-                        </div>
-                        <div>{formatDateInfo(lightInfo.time)}</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div name="threshold" className="mx-[var(--spacing-x)] mt-[var(--spacing-y)]">
-                <div className="float-left">
-                  {t('common.lowerThreshold')}
-                  {lightLoading ? (
-                    <div></div>
-                  ) : (
-                    <div className="mx-auto w-[96px] h-[44px]">
-                      <input
-                        type="number"
-                        className="bg-mainRed text-center rounded-full w-full h-full text-white"
-                        value={lightInfo.lowerThreshold}
-                        onChange={(e) =>
-                          setLightInfo({
-                            ...lightInfo,
-                            lowerThreshold:
-                              e.target.value != ""
-                                ? parseFloat(e.target.value)
-                                : "",
-                          })
-                        }
-                        onKeyDown={(e) => handleKeyDown(e, "light")}
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="float-right">
-                  {t('common.upperThreshold')}
-                  {lightLoading ? (
-                    <div></div>
-                  ) : (
-                    <div className="mx-auto w-[96px] h-[44px]">
-                      <input
-                        type="number"
-                        className="bg-mainRed text-center rounded-full w-full h-full text-white"
-                        value={lightInfo.upperThreshold}
-                        onChange={(e) =>
-                          setLightInfo({
-                            ...lightInfo,
-                            upperThreshold:
-                              e.target.value != ""
-                                ? parseFloat(e.target.value)
-                                : "",
-                          })
-                        }
-                        onKeyDown={(e) => handleKeyDown(e, "light")}
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="clear-both"></div>
-              </div>
-            </div>
-          </div>
-          <div className="col-span-1 bg-white rounded-xl shadow-sm pb-[var(--spacing-y)]">
-            <div name="title-subtitle" className="ml-[var(--spacing-x)] mt-[var(--spacing-y)]">
-              <div name="title" className="font-bold">
-                {t('sensor.airHumidity')}
-              </div>
-              <div name="subtitle">{t('sensor.sourceAirHumidity')}</div>
-            </div>
-            <div className="w-[300px] mx-auto mt-[var(--spacing-y)]">
-              <div className="flex flex-col justify-center items-center">
-                {humidLoading ? (
-                  <div className="w-[250px] h-[250px] flex items-center justify-center">
-                    <CircularProgress
-                      variant="indeterminate"
-                      value={50}
-                      size={50}
-                      thickness={3}
-                    />
-                  </div>
-                ) : (
-                  <div className="relative inline-flex">
-                    <CircularProgress
-                      variant="determinate"
-                      value={
-                        humidInfo.value < humidInfo.lowerThreshold
-                          ? humidInfo.value
-                          : humidInfo.lowerThreshold - 0.1
-                      }
-                      size={250}
-                      thickness={3}
-                      color={humidInfo.needNoti ? "warning" : "success"}
-                      style={{
-                        transform: "rotate(90deg)",
-                        zIndex: 2,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={
-                        humidInfo.value > humidInfo.upperThreshold
-                          ? humidInfo.upperThreshold -
-                            humidInfo.lowerThreshold -
-                            0.4
-                          : humidInfo.value > humidInfo.lowerThreshold
-                            ? humidInfo.value - humidInfo.lowerThreshold - 0.4
-                            : 0
-                      }
-                      size={250}
-                      thickness={3}
-                      color={humidInfo.needNoti ? "warning" : "success"}
-                      style={{
-                        transform:
-                          "rotate(" +
-                          (Math.floor(
-                            90 + (humidInfo.lowerThreshold * 360) / 100
-                          ) +
-                            1) +
-                          "deg)",
-                        position: "absolute",
-                        zIndex: 2,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={
-                        humidInfo.value > humidInfo.upperThreshold
-                          ? humidInfo.value - humidInfo.upperThreshold - 0.4
-                          : 0
-                      }
-                      size={250}
-                      thickness={3}
-                      color={humidInfo.needNoti ? "warning" : "success"}
-                      style={{
-                        transform:
-                          "rotate(" +
-                          (Math.floor(
-                            90 + (humidInfo.upperThreshold * 360) / 100
-                          ) +
-                            1) +
-                          "deg)",
-                        position: "absolute",
-                        zIndex: 2,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={humidInfo.lowerThreshold - 0.01}
-                      size={250}
-                      thickness={3}
-                      style={{
-                        color: "lightGray",
-                        transform: "rotate(90deg)",
-                        position: "absolute",
-                        zIndex: 1,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={
-                        humidInfo.upperThreshold -
-                        humidInfo.lowerThreshold -
-                        0.4
-                      }
-                      size={250}
-                      thickness={3}
-                      style={{
-                        color: "lightGray",
-                        transform:
-                          "rotate(" +
-                          (Math.floor(
-                            90 + (humidInfo.lowerThreshold * 360) / 100
-                          ) +
-                            1) +
-                          "deg)",
-                        position: "absolute",
-                        zIndex: 1,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={100 - humidInfo.upperThreshold - 0.4}
-                      size={250}
-                      thickness={3}
-                      style={{
-                        color: "lightGray",
-                        transform:
-                          "rotate(" +
-                          (Math.floor(
-                            90 + (humidInfo.upperThreshold * 360) / 100
-                          ) +
-                            1) +
-                          "deg)",
-                        position: "absolute",
-                        zIndex: 1,
-                      }}
-                    />
-                    <div className="w-full h-full rounded-full bg-lightGray z-0 absolute"></div>
-                    <div className="flex top-0 left-0 bottom-0 right-0 absolute justify-center items-center">
-                      <div className="flex flex-col justify-center items-center">
-                        <img
-                          alt=""
-                          src={
-                            humidInfo.needNoti
-                              ? AirHumidityWarning
-                              : AirHumidityGood
-                          }
-                        />
-                        <div
-                          className={
-                            "font-bold text-[1.5rem] text-center" +
-                            (humidInfo.needNoti
-                              ? " text-warning"
-                              : " text-success")
-                          }
-                        >
-                          {humidInfo.value} %
-                          <div className="font-normal text-[1rem]">
-                            {humidInfo.needNoti
-                              ? t('sensor.humidityOutOfRange')
-                              : t('sensor.humidityNormal')}
-                          </div>
-                        </div>
-                        <div>{formatDateInfo(humidInfo.time)}</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div name="threshold" className="mx-[var(--spacing-x)] mt-[var(--spacing-y)]">
-                <div className="float-left">
-                  {t('common.lowerThreshold')}
-                  {humidLoading ? (
-                    <div></div>
-                  ) : (
-                    <div className="mx-auto w-[96px] h-[44px]">
-                      <input
-                        type="number"
-                        className="bg-mainRed text-center rounded-full w-full h-full text-white"
-                        value={humidInfo.lowerThreshold}
-                        onChange={(e) =>
-                          setHumidInfo({
-                            ...humidInfo,
-                            lowerThreshold:
-                              e.target.value != ""
-                                ? parseFloat(e.target.value)
-                                : "",
-                          })
-                        }
-                        onKeyDown={(e) => handleKeyDown(e, "humid")}
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="float-right">
-                  {t('common.upperThreshold')}
-                  {humidLoading ? (
-                    <div></div>
-                  ) : (
-                    <div className="mx-auto w-[96px] h-[44px]">
-                      <input
-                        type="number"
-                        className="bg-mainRed text-center rounded-full w-full h-full text-white"
-                        value={humidInfo.upperThreshold}
-                        onChange={(e) =>
-                          setHumidInfo({
-                            ...humidInfo,
-                            upperThreshold:
-                              e.target.value != ""
-                                ? parseFloat(e.target.value)
-                                : "",
-                          })
-                        }
-                        onKeyDown={(e) => handleKeyDown(e, "humid")}
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="clear-both"></div>
-              </div>
-            </div>
-          </div>
-          <div className="col-span-1 bg-white rounded-xl shadow-sm pb-[var(--spacing-y)]">
-            <div name="title-subtitle" className="ml-[var(--spacing-x)] mt-[var(--spacing-y)]">
-              <div name="title" className="font-bold">
-                {t('sensor.soilMoisture')}
-              </div>
-              <div name="subtitle">{t('sensor.sourceSoilMoisture')}</div>
-            </div>
-            <div className="w-[300px] mx-auto mt-[var(--spacing-y)]">
-              <div className="flex flex-col justify-center items-center">
-                {moistureLoading ? (
-                  <div className="w-[250px] h-[250px] flex items-center justify-center">
-                    <CircularProgress
-                      variant="indeterminate"
-                      value={50}
-                      size={50}
-                      thickness={3}
-                    />
-                  </div>
-                ) : (
-                  <div className="relative inline-flex">
-                    <CircularProgress
-                      variant="determinate"
-                      value={
-                        moistureInfo.value < moistureInfo.lowerThreshold
-                          ? moistureInfo.value
-                          : moistureInfo.lowerThreshold - 0.1
-                      }
-                      size={250}
-                      thickness={3}
-                      color={moistureInfo.needNoti ? "warning" : "success"}
-                      style={{
-                        transform: "rotate(90deg)",
-                        zIndex: 2,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={
-                        moistureInfo.value > moistureInfo.upperThreshold
-                          ? moistureInfo.upperThreshold -
-                            moistureInfo.lowerThreshold -
-                            0.4
-                          : moistureInfo.value > moistureInfo.lowerThreshold
-                            ? moistureInfo.value -
-                              moistureInfo.lowerThreshold -
-                              0.4
-                            : 0
-                      }
-                      size={250}
-                      thickness={3}
-                      color={moistureInfo.needNoti ? "warning" : "success"}
-                      style={{
-                        transform:
-                          "rotate(" +
-                          (Math.floor(
-                            90 + (moistureInfo.lowerThreshold * 360) / 100
-                          ) +
-                            1) +
-                          "deg)",
-                        position: "absolute",
-                        zIndex: 2,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={
-                        moistureInfo.value > moistureInfo.upperThreshold
-                          ? moistureInfo.value -
-                            moistureInfo.upperThreshold -
-                            0.4
-                          : 0
-                      }
-                      size={250}
-                      thickness={3}
-                      color={moistureInfo.needNoti ? "warning" : "success"}
-                      style={{
-                        transform:
-                          "rotate(" +
-                          (Math.floor(
-                            90 + (moistureInfo.upperThreshold * 360) / 100
-                          ) +
-                            1) +
-                          "deg)",
-                        position: "absolute",
-                        zIndex: 2,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={moistureInfo.lowerThreshold - 0.01}
-                      size={250}
-                      thickness={3}
-                      style={{
-                        color: "lightGray",
-                        transform: "rotate(90deg)",
-                        position: "absolute",
-                        zIndex: 1,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={
-                        moistureInfo.upperThreshold -
-                        moistureInfo.lowerThreshold -
-                        0.4
-                      }
-                      size={250}
-                      thickness={3}
-                      style={{
-                        color: "lightGray",
-                        transform:
-                          "rotate(" +
-                          (Math.floor(
-                            90 + (moistureInfo.lowerThreshold * 360) / 100
-                          ) +
-                            1) +
-                          "deg)",
-                        position: "absolute",
-                        zIndex: 1,
-                      }}
-                    />
-                    <CircularProgress
-                      variant="determinate"
-                      value={100 - moistureInfo.upperThreshold - 0.4}
-                      size={250}
-                      thickness={3}
-                      style={{
-                        color: "lightGray",
-                        transform:
-                          "rotate(" +
-                          (Math.floor(
-                            90 + (moistureInfo.upperThreshold * 360) / 100
-                          ) +
-                            1) +
-                          "deg)",
-                        position: "absolute",
-                        zIndex: 1,
-                      }}
-                    />
-                    <div className="w-full h-full rounded-full bg-lightGray z-0 absolute"></div>
-                    <div className="flex top-0 left-0 bottom-0 right-0 absolute justify-center items-center">
-                      <div className="flex flex-col justify-center items-center">
-                        <img
-                          alt=""
-                          src={
-                            moistureInfo.needNoti
-                              ? SoilMoistureWarning
-                              : SoilMoistureGood
-                          }
-                        />
-                        <div
-                          className={
-                            "font-bold text-[1.5rem] text-center" +
-                            (moistureInfo.needNoti
-                              ? " text-warning"
-                              : " text-success")
-                          }
-                        >
-                          {moistureInfo.value} %
-                          <div className="font-normal text-[1rem]">
-                            {moistureInfo.needNoti
-                              ? t('sensor.humidityOutOfRange')
-                              : t('sensor.humidityNormal')}
-                          </div>
-                        </div>
-                        <div>{formatDateInfo(moistureInfo.time)}</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div name="threshold" className="mx-[var(--spacing-x)] mt-[var(--spacing-y)]">
-                <div className="float-left">
-                  {t('common.lowerThreshold')}
-                  {moistureLoading ? (
-                    <div></div>
-                  ) : (
-                    <div className="mx-auto w-[96px] h-[44px]">
-                      <input
-                        type="number"
-                        className="bg-mainRed text-center rounded-full w-full h-full text-white"
-                        value={moistureInfo.lowerThreshold}
-                        onChange={(e) =>
-                          setMoistureInfo({
-                            ...moistureInfo,
-                            lowerThreshold:
-                              e.target.value != ""
-                                ? parseFloat(e.target.value)
-                                : "",
-                          })
-                        }
-                        onKeyDown={(e) => handleKeyDown(e, "moisture")}
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="float-right">
-                  {t('common.upperThreshold')}
-                  {moistureLoading ? (
-                    <div></div>
-                  ) : (
-                    <div className="mx-auto w-[96px] h-[44px]">
-                      <input
-                        type="number"
-                        className="bg-mainRed text-center rounded-full w-full h-full text-white"
-                        value={moistureInfo.upperThreshold}
-                        onChange={(e) =>
-                          setMoistureInfo({
-                            ...moistureInfo,
-                            upperThreshold:
-                              e.target.value != ""
-                                ? parseFloat(e.target.value)
-                                : "",
-                          })
-                        }
-                        onKeyDown={(e) => handleKeyDown(e, "moisture")}
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="clear-both"></div>
-              </div>
-            </div>
-          </div>
+          {sensors.map((s) => (
+            <SensorCard
+              key={s.key}
+              title={s.title}
+              subtitle={s.subtitle}
+              loading={s.loading}
+              info={s.info}
+              arc={s.arc}
+              unit={s.unit}
+              iconGood={s.iconGood}
+              iconWarn={s.iconWarn}
+              normalKey={s.normalKey}
+              warnKey={s.warnKey}
+              onLowerChange={onThresholdChange(s.setInfo, s.info, "lowerThreshold")}
+              onUpperChange={onThresholdChange(s.setInfo, s.info, "upperThreshold")}
+              onKeyDown={(e) => handleKeyDown(e, s.key)}
+            />
+          ))}
         </div>
       </div>
     </div>

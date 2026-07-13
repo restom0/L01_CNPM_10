@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { DUMMY_LOGS } from "../../data/dummyData";
-import { getApiErrorMessage, isUnauthorized } from "../../utils/apiError";
+import { getTranslatedApiErrorMessage, isUnauthorized } from "../../utils/apiError";
 import { useI18n } from "../../i18n";
+import { classes } from "../../styles/classes";
 
 function formatTime(dateString) {
   const date = new Date(dateString);
@@ -38,7 +39,7 @@ export default function History(props) {
         setlogData(toLogRows(response.data));
       } catch (error) {
         if (isUnauthorized(error)) {
-          alert("Error: " + getApiErrorMessage(error));
+          alert(getTranslatedApiErrorMessage(t, error));
           navigate("/login");
         } else {
           setlogData(toLogRows(DUMMY_LOGS));
@@ -47,10 +48,10 @@ export default function History(props) {
       }
     };
     fetchData();
-  }, [navigate, sessionID]);
+  }, [navigate, sessionID, t]);
   return (
     <div
-      className="md:w-[280px] xl:w-[400px] 2xl:w-[400px] h-[400px] bg-white p-[var(--spacing-y)] overflow-auto"
+      className={`md:w-[280px] xl:w-[400px] 2xl:w-[400px] h-[400px] ${classes.panel} p-[var(--spacing-y)] overflow-auto`}
       onClick={() => navigate("/log")}
     >
       <p className="font-bold">{t('log.title')}</p>
@@ -59,8 +60,8 @@ export default function History(props) {
         {logData.length === 0 ? (
           <p className="py-[var(--spacing-x)]">{t('log.noTodayData')}</p>
         ) : (
-          logData.map((item, index) => (
-            <p key={index} className="py-[var(--spacing-x)]">
+          logData.map((item) => (
+            <p key={`${item.time}-${item.activity}`} className="py-[var(--spacing-x)]">
               {" "}
               {item.time}: {item.activity}{" "}
             </p>

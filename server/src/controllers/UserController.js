@@ -4,7 +4,7 @@ import { createApiKey } from '../middlewares/useApiKey.js'
 import { UserService } from '../services/UserService.js'
 import { CommonUtils } from '../utils/common.js'
 
-const login = async (req, res, next) => {
+const login = async (req, res) => {
   try {
     const { username, password } = req.body
     if (CommonUtils.checkNullOrUndefined(username)) {
@@ -22,7 +22,7 @@ const login = async (req, res, next) => {
     res.status(error.statusCode).json({ error: error.message })
   }
 }
-const register = async (req, res, next) => {
+const register = async (req, res) => {
   try {
     const { username, password, mqttUsername, aioKey } = req.body
     if (CommonUtils.checkNullOrUndefined(username)) {

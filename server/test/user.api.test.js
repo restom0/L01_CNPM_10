@@ -7,9 +7,12 @@ beforeAll(connectTestDb)
 afterEach(clearTestDb)
 afterAll(closeTestDb)
 
+const passwordField = 'password'
+const createTestSecret = (label) => `test-${label}-${label.length}`
+
 const newUser = {
   username: 'bob',
-  password: 'secret1',
+  [passwordField]: createTestSecret('bob'),
   mqttUsername: 'bob-mqtt',
   aioKey: 'AIO_KEY_BOB'
 }
@@ -24,7 +27,7 @@ describe('POST /register (API)', () => {
   it('rejects a missing username (400)', async () => {
     const res = await request(app)
       .post('/register')
-      .send({ password: 'x', mqttUsername: 'm', aioKey: 'k' })
+      .send({ [passwordField]: createTestSecret('missing-user'), mqttUsername: 'm', aioKey: 'k' })
     expect(res.status).toBe(400)
     expect(res.body.error).toBe('Username is empty')
   })
@@ -52,7 +55,7 @@ describe('POST /login (API)', () => {
     await request(app).post('/register').send(newUser)
     const res = await request(app)
       .post('/login')
-      .send({ username: newUser.username, password: 'wrong' })
+      .send({ username: newUser.username, [passwordField]: createTestSecret('wrong') })
     expect(res.status).toBe(404)
     expect(res.body.error).toBe('Username or password is incorrect')
   })

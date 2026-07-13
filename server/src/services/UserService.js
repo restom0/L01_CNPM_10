@@ -1,19 +1,29 @@
 import { BadRequestError } from '../errors/badRequest.error.js'
 import { UserModel } from '../models/Users.js'
 import { Types } from 'mongoose'
+
+const toSafeString = (value) => (typeof value === 'string' ? value : String(value ?? ''))
+
 const login = async (inputUserName, inputPassword) => {
-  return await UserModel.findOne({ username: inputUserName, password: inputPassword }).exec()
+  const username = toSafeString(inputUserName)
+  const password = toSafeString(inputPassword)
+  return await UserModel.findOne({ username: { $eq: username }, password: { $eq: password } }).exec()
 }
 const register = async (username, password, mqttUsername, aioKey) => {
-  if (await UserModel.findOne({ username })) {
+  const safeUsername = toSafeString(username)
+  const safePassword = toSafeString(password)
+  const safeMqttUsername = toSafeString(mqttUsername)
+  const safeAioKey = toSafeString(aioKey)
+
+  if (await UserModel.findOne({ username: { $eq: safeUsername } })) {
     throw new BadRequestError('Account existed')
   }
   const user = new UserModel({
     _id: new Types.ObjectId(),
-    username,
-    password,
-    mqttusername: mqttUsername,
-    AIO_Key: aioKey
+    username: safeUsername,
+    password: safePassword,
+    mqttusername: safeMqttUsername,
+    AIO_Key: safeAioKey
   })
   return await user.save()
 }

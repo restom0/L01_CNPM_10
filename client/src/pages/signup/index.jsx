@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import LanguageSwitcher from '../../components/languageSwitcher';
 import { useI18n } from '../../i18n';
+import { classes } from '../../styles/classes';
+import { getTranslatedApiErrorMessage } from '../../utils/apiError';
 
 export default function Signup() {
     const [username, setUsername] = useState('');
@@ -15,24 +17,24 @@ export default function Signup() {
     const { t } = useI18n();
     const handleRegister = async () => { 
         try {
-            if (username==''){
+            if (username === ''){
                 alert(t('error.usernameRequired'))
             }
-            else if (password==''){
+            else if (password === ''){
                 alert(t('error.passwordRequired'))
             }
-            else if (mqttUsername=='') {
+            else if (mqttUsername === '') {
                 alert(t('error.mqttUsernameRequired'))
             }
-            else if (aioKey=='') {
+            else if (aioKey === '') {
                 alert(t('error.aioKeyRequired'))
             }
-            else if (password != rePassword){
+            else if (password !== rePassword){
                 alert(t('error.passwordMismatch'));
             }
             else{
                 const registerResponse = await axios.post('http://localhost:3001/register',{username: username,password: password,mqttUsername: mqttUsername,aioKey: aioKey});
-                if (registerResponse.data.data=="Register successfully"){
+                if (registerResponse.data.data === "Register successfully"){
                     alert(t('register.success'));
                     setTimeout(() => {
                         navigate('/login');
@@ -40,8 +42,8 @@ export default function Signup() {
                 }
             }
         }catch (error) {
-            if (error.response?.status == 400) {
-                if (error.response?.data?.error=="Account existed"){
+            if (error.response?.status === 400) {
+                if (error.response?.data?.error === "Account existed"){
                     alert(t('error.accountExists'))
                 }
                 else{
@@ -49,43 +51,43 @@ export default function Signup() {
                 }
             }
             else{
-                alert(error.message || error);
+                alert(getTranslatedApiErrorMessage(t, error));
             }
         }
     };
     return (
-        <div className="relative min-h-screen h-screen bg-cover flex items-center justify-center" style={{backgroundImage: `url(${loginBackground})`, backgroundPosition: 'center bottom'}}>
+        <div className={classes.authShell} style={{backgroundImage: `url(${loginBackground})`, backgroundPosition: 'center bottom'}}>
             <div className="absolute right-[var(--spacing-section)] top-[var(--spacing-section)]">
                 <LanguageSwitcher />
             </div>
-            <div className="w-4/12 bg-white lg:h-[675px] 2xl:h-[695px] rounded-xl p-[var(--spacing-section)] flex flex-col justify-center items-center">
+            <div className={`${classes.authCard} lg:h-[675px] 2xl:h-[695px]`}>
                 <p className="font-semibold text-center text-xl pt-[var(--spacing-x)]">{t('auth.signup')}</p>
                 <div className="mt-[var(--spacing-section)] w-2/3">
                     <p className="font-semibold">{t('auth.username')}</p>
-                    <input type="text" className="w-full px-4 py-2 border-none rounded-2xl bg-gray-100" required placeholder="" value={username} onChange={(e) => setUsername(e.target.value)}/>
+                    <input type="text" className={classes.authField} required value={username} onChange={(e) => setUsername(e.target.value)}/>
                 </div>
                 <div className="mt-[var(--spacing-y)] w-2/3">
                     <p className="font-semibold">{t('auth.password')}</p>
-                    <input type="password" className="w-full px-4 py-2 border-none rounded-2xl bg-gray-100" required placeholder="" value={password} onChange={(e) => setPassword(e.target.value)}/>
+                    <input type="password" className={classes.authField} required value={password} onChange={(e) => setPassword(e.target.value)}/>
                 </div>
                 <div className="mt-[var(--spacing-y)] w-2/3">
                     <p className="font-semibold">{t('auth.reEnterPassword')}</p>
-                    <input type="password" className="w-full px-4 py-2 border-none rounded-2xl bg-gray-100" required placeholder="" value={rePassword} onChange={(e) => setRePassword(e.target.value)}/>
+                    <input type="password" className={classes.authField} required value={rePassword} onChange={(e) => setRePassword(e.target.value)}/>
                 </div>
                 <div className="mt-[var(--spacing-y)] w-2/3">
                     <p className="font-semibold">{t('auth.adafruitUsername')}</p>
-                    <input type="text" className="w-full px-4 py-2 border-none rounded-2xl bg-gray-100" required placeholder="" value={mqttUsername} onChange={(e) => setMqttUsername(e.target.value)}/>
+                    <input type="text" className={classes.authField} required value={mqttUsername} onChange={(e) => setMqttUsername(e.target.value)}/>
                 </div>
                 <div className="mt-[var(--spacing-y)] w-2/3">
                     <p className="font-semibold">{t('auth.aioKey')}</p>
-                    <input type="password" className="w-full px-4 py-2 border-none rounded-2xl bg-gray-100" required placeholder="" value={aioKey} onChange={(e) => setAioKey(e.target.value)}/>
+                    <input type="password" className={classes.authField} required value={aioKey} onChange={(e) => setAioKey(e.target.value)}/>
                 </div>
                 <div className="mt-[var(--spacing-section)] w-2/3">
-                    <button className="w-full min-h-[44px] bg-sky-600 text-white py-1 px-4 rounded-xl hover:bg-sky-700 font-semibold" onClick={handleRegister}>{t('auth.signup')}</button>
+                    <button className={classes.authSubmitButton} onClick={handleRegister}>{t('auth.signup')}</button>
                 </div>
                 <div className="mt-[var(--spacing-x)] w-full text-center">
                     <p className="inline-block">{t('auth.haveAccount')}&nbsp;</p>
-                    <button type="button" className="text-sky-500 underline hover:text-sky-700" onClick={() => navigate('/login')}>{t('auth.loginHere')}</button>
+                    <button type="button" className={classes.textLinkButton} onClick={() => navigate('/login')}>{t('auth.loginHere')}</button>
                 </div>
             </div>
         </div>

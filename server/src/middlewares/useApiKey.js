@@ -2,11 +2,12 @@ import { Types } from 'mongoose'
 import { UserService } from '../services/UserService.js'
 import { CommonUtils } from '../utils/common.js'
 import jwt from 'jsonwebtoken'
+import { randomBytes } from 'crypto'
 import { NotFoundError } from '../errors/notFound.error.js'
 import { ForbiddenRequestError } from '../errors/forbiddenRequest.error.js'
 import { UnAuthorizedError } from '../errors/unauthorizedRequest.error.js'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secret'
+const JWT_SECRET = process.env.JWT_SECRET ?? randomBytes(32).toString('hex')
 
 export const createApiKey = (data) => {
   const token = jwt.sign(

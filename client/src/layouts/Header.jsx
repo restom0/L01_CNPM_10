@@ -3,6 +3,7 @@ import { IoMdSettings, IoIosNotifications } from 'react-icons/io'
 import { Link } from 'react-router-dom'
 import SettingsDialog from '../components/settingsDialog'
 import { useI18n } from '../i18n'
+import { classes } from '../styles/classes'
 
 export default function Header() {
 	const { t } = useI18n();
@@ -20,14 +21,14 @@ export default function Header() {
 					type="button"
 					onClick={() => setSettingsOpen(true)}
 					aria-label={t('settings.title')}
-					className="rounded-md p-1 text-white outline-none hover:opacity-80 focus-visible:ring-2 focus-visible:ring-white"
+					className={classes.headerIconButton}
 				>
 					<IoMdSettings size={22} />
 				</button>
 				<button
 					type="button"
 					aria-label={t('nav.user')}
-					className="rounded-md p-1 text-white outline-none hover:opacity-80 focus-visible:ring-2 focus-visible:ring-white"
+					className={classes.headerIconButton}
 				>
 					<IoIosNotifications size={22} />
 				</button>

@@ -8,9 +8,11 @@ beforeAll(connectTestDb)
 afterEach(clearTestDb)
 afterAll(closeTestDb)
 
+const createTestSecret = (label) => `test-${label}-${label.length}`
+
 const sample = {
   username: 'alice',
-  password: 'pw123',
+  password: createTestSecret('alice'),
   mqttUsername: 'alice-mqtt',
   aioKey: 'AIO_KEY_XYZ'
 }
@@ -34,7 +36,7 @@ describe('UserService.register (IT)', () => {
   it('rejects a duplicate username with BadRequestError', async () => {
     await UserService.register(sample.username, sample.password, sample.mqttUsername, sample.aioKey)
     await expect(
-      UserService.register(sample.username, 'other', 'm', 'k')
+      UserService.register(sample.username, createTestSecret('other'), 'm', 'k')
     ).rejects.toBeInstanceOf(BadRequestError)
   })
 })
@@ -42,14 +44,14 @@ describe('UserService.register (IT)', () => {
 describe('UserService.login (IT)', () => {
   it('returns the user for correct credentials', async () => {
     await UserService.register(sample.username, sample.password, sample.mqttUsername, sample.aioKey)
-    const found = await UserService.login('alice', 'pw123')
+    const found = await UserService.login('alice', sample.password)
     expect(found).not.toBeNull()
     expect(found.username).toBe('alice')
   })
 
   it('returns null for a wrong password', async () => {
     await UserService.register(sample.username, sample.password, sample.mqttUsername, sample.aioKey)
-    const found = await UserService.login('alice', 'nope')
+    const found = await UserService.login('alice', createTestSecret('wrong'))
     expect(found).toBeNull()
   })
 })

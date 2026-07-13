@@ -5,7 +5,11 @@ let mongod
 
 // Spin up an in-memory MongoDB and point mongoose at it. Call in beforeAll.
 export async function connectTestDb () {
-  mongod = await MongoMemoryServer.create()
+  mongod = await MongoMemoryServer.create({
+    instance: {
+      launchTimeout: 60000
+    }
+  })
   await mongoose.connect(mongod.getUri())
 }
 
@@ -19,7 +23,9 @@ export async function clearTestDb () {
 
 // Tear everything down. Call in afterAll.
 export async function closeTestDb () {
-  await mongoose.connection.dropDatabase()
-  await mongoose.connection.close()
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.connection.dropDatabase()
+    await mongoose.connection.close()
+  }
   if (mongod) await mongod.stop()
 }

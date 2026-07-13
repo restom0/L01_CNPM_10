@@ -4,8 +4,9 @@ import { Chart } from 'react-google-charts';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { DUMMY_CHART_SERIES } from '../../data/dummyData';
-import { getApiErrorMessage, isUnauthorized } from '../../utils/apiError';
+import { getTranslatedApiErrorMessage, isUnauthorized } from '../../utils/apiError';
 import { useI18n } from '../../i18n';
+import { classes } from '../../styles/classes';
 
 function toDate(str) {
     return new Date(str);
@@ -17,13 +18,13 @@ export default function Charts(props) {
     const { t, language } = useI18n();
     const makeChartData = useCallback((series, unit) => [
         [{ type: "date", label: t("chart.time") }, unit],
-        ...series.map(({data, Date}) => [toDate(Date), parseFloat(data)]),
+        ...series.map(({data, Date: dateValue}) => [toDate(dateValue), Number.parseFloat(data)]),
     ], [t]);
     const [tempLoading, setTempLoading] = useState(true);
     const [lightLoading, setLightLoading] = useState(true);
     const [humidLoading, setHumidLoading] = useState(true);
     const [moistureLoading, setMoistureLoading] = useState(true);
-    const [EDLoading, setEDLoading] = useState(true);
+    const [environmentDrynessLoading, setEnvironmentDrynessLoading] = useState(true);
     const [processedTemp, setProcessedTemp] = useState(() => makeChartData([], "°C"));
     const [processedLight, setProcessedLight] = useState(() => makeChartData([], "lux"));
     const [processedHumid, setProcessedHumid] = useState(() => makeChartData([], "%"));
@@ -54,12 +55,12 @@ export default function Charts(props) {
                 setProcessedMoisture(makeChartData(moistureResponse.data.data, "%"));
                 setMoistureLoading(false);
                 
-                const EDResponse = await axios.get(`http://localhost:3001/sensors/chart/ed`, config);
-                setProcessedED(makeChartData(EDResponse.data.data, ""));
-                setEDLoading(false);
+                const environmentDrynessResponse = await axios.get(`http://localhost:3001/sensors/chart/ed`, config);
+                setProcessedED(makeChartData(environmentDrynessResponse.data.data, ""));
+                setEnvironmentDrynessLoading(false);
             } catch (error) {
                 if (isUnauthorized(error)) {
-                    alert('Error: ' + getApiErrorMessage(error));
+                    alert(getTranslatedApiErrorMessage(t, error));
                     navigate('/login');
                 }
                 else {
@@ -72,7 +73,7 @@ export default function Charts(props) {
                     setLightLoading(false);
                     setHumidLoading(false);
                     setMoistureLoading(false);
-                    setEDLoading(false);
+                    setEnvironmentDrynessLoading(false);
                     console.error("Error fetching data:", error);
                 }
             }
@@ -81,18 +82,18 @@ export default function Charts(props) {
         const intervalId = setInterval(fetchData, 10 * 1000);
 
         return () => clearInterval(intervalId);
-    }, [language, makeChartData, navigate, sessionID]);
+    }, [language, makeChartData, navigate, sessionID, t]);
 
     return (
         <div>
-            <div className='h-[500px] rounded-lg bg-white mb-[var(--spacing-section)]'>
+            <div className={classes.chartCard}>
                 <div name='title-subtitle' className='pl-[var(--spacing-x)] pt-[var(--spacing-y)]'>
                     <div name='title' className='font-bold'>
                         {t('sensor.environmentDryness')}
                     </div>
                 </div>
-                {EDLoading ? (
-                    <div className='h-[500px] rounded-lg bg-white mb-[var(--spacing-section)] text-center leading-[400px]'>
+                {environmentDrynessLoading ? (
+                    <div className={classes.chartLoader}>
                         <CircularProgress
                             variant='indeterminate' value={50}
                             size={50}
@@ -117,14 +118,14 @@ export default function Charts(props) {
                     </div>
                 )}
             </div>
-            <div className='h-[500px] rounded-lg bg-white mb-[var(--spacing-section)]'>
+            <div className={classes.chartCard}>
                 <div name='title-subtitle' className='pl-[var(--spacing-x)] pt-[var(--spacing-y)]'>
                     <div name='title' className='font-bold'>
                         {t('sensor.temperature')}
                     </div>
                 </div>
                 {tempLoading ? (
-                    <div className='h-[500px] rounded-lg bg-white mb-[var(--spacing-section)] text-center leading-[400px]'>
+                    <div className={classes.chartLoader}>
                         <CircularProgress
                             variant='indeterminate' value={50}
                             size={50}
@@ -149,14 +150,14 @@ export default function Charts(props) {
                     </div>
                 )}
             </div>
-            <div className='h-[500px] rounded-lg bg-white mb-[var(--spacing-section)]'>
+            <div className={classes.chartCard}>
                 <div name='title-subtitle' className='pl-[var(--spacing-x)] pt-[var(--spacing-y)]'>
                     <div name='title' className='font-bold'>
                         {t('sensor.light')}
                     </div>
                 </div>
                 {lightLoading ? (
-                    <div className='h-[500px] rounded-lg bg-white mb-[var(--spacing-section)] text-center leading-[400px]'>
+                    <div className={classes.chartLoader}>
                         <CircularProgress
                             variant='indeterminate' value={50}
                             size={50}
@@ -181,14 +182,14 @@ export default function Charts(props) {
                     </div>
                 )}
             </div>
-            <div className='h-[500px] rounded-lg bg-white mb-[var(--spacing-section)]'>
+            <div className={classes.chartCard}>
                 <div name='title-subtitle' className='pl-[var(--spacing-x)] pt-[var(--spacing-y)]'>
                     <div name='title' className='font-bold'>
                         {t('sensor.airHumidity')}
                     </div>
                 </div>
                 {humidLoading ? (
-                    <div className='h-[500px] rounded-lg bg-white mb-[var(--spacing-section)] text-center leading-[400px]'>
+                    <div className={classes.chartLoader}>
                         <CircularProgress
                             variant='indeterminate' value={50}
                             size={50}
@@ -213,14 +214,14 @@ export default function Charts(props) {
                     </div>
                 )}
             </div>
-            <div className='h-[500px] rounded-lg bg-white mb-[var(--spacing-section)]'>
+            <div className={classes.chartCard}>
                 <div name='title-subtitle' className='pl-[var(--spacing-x)] pt-[var(--spacing-y)]'>
                     <div name='title' className='font-bold'>
                         {t('sensor.soilMoisture')}
                     </div>
                 </div>
                 {moistureLoading ? (
-                    <div className='h-[500px] rounded-lg bg-white mb-[var(--spacing-section)] text-center leading-[400px]'>
+                    <div className={classes.chartLoader}>
                         <CircularProgress
                             variant='indeterminate' value={50}
                             size={50}

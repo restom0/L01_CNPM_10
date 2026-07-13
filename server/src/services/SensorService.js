@@ -81,12 +81,16 @@ const getLastEnvironmentValue = async (key, mqtt, id) => {
   const light = await getLastLightValue(mqtt, id)
   const temp = await getLastTemperatureValue(mqtt, id)
   const moist = await getLastMoistureValue(mqtt, id)
-  const temper = parseFloat(light.value) / 40.0
-  const ED = temper + parseFloat(temp.value) - parseFloat(humidity.value) - parseFloat(moist.value)
+  const lightContribution = Number.parseFloat(light.value) / 40.0
+  const environmentDryness =
+    lightContribution +
+    Number.parseFloat(temp.value) -
+    Number.parseFloat(humidity.value) -
+    Number.parseFloat(moist.value)
   const result = await EnvironmentalDrynessModel.find({ userID: id }).sort({ Date: -1 })
-  const estimatedED = result[0].data * 0.125 + ED * 0.875
+  const estimatedEnvironmentDryness = result[0].data * 0.125 + environmentDryness * 0.875
   const ted = await SensorModel.findOne({ userID: id })
-  if (estimatedED > ted.upperEnvironmentDrynessThreshold) {
+  if (estimatedEnvironmentDryness > ted.upperEnvironmentDrynessThreshold) {
     const waterpumpStatus = await WaterPumpService.getLastWaterPumpValue(mqtt, id)
 
     if (waterpumpStatus.value === 'OFF') {
@@ -96,7 +100,7 @@ const getLastEnvironmentValue = async (key, mqtt, id) => {
       }, 900000)
     }
   }
-  if (estimatedED < ted.lowerEnvironmentDrynessThreshold) {
+  if (estimatedEnvironmentDryness < ted.lowerEnvironmentDrynessThreshold) {
     const waterpumpStatus = await WaterPumpService.getLastWaterPumpValue(mqtt, id)
     if (waterpumpStatus.value === 'ON') {
       await WaterPumpService.turnOffPump(key, mqtt, id)
@@ -105,7 +109,7 @@ const getLastEnvironmentValue = async (key, mqtt, id) => {
   const ed = new EnvironmentalDrynessModel({
     _id: new mongoose.Types.ObjectId(),
     userID: id,
-    data: estimatedED,
+    data: estimatedEnvironmentDryness,
     Date: humidity.created_at
   })
   await ed.save()

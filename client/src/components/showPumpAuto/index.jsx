@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import {CircularProgress} from '@mui/material';
 import { MdCancel, MdEdit } from 'react-icons/md';
 import { DUMMY_PUMP_AUTOS } from '../../data/dummyData';
-import { getApiErrorMessage, isUnauthorized } from '../../utils/apiError';
+import { getTranslatedApiErrorMessage, isUnauthorized } from '../../utils/apiError';
 import { useI18n } from '../../i18n';
+import { classes } from '../../styles/classes';
 
 export default function ShowPumpAuto(props) {
     const [pumpAutos, setPumpAutos] = useState([]);
@@ -42,7 +43,7 @@ export default function ShowPumpAuto(props) {
             alert(t('pump.editAutoSuccess'));
         } catch (error) {
             if (isUnauthorized(error)) {
-                alert('Error: ' + getApiErrorMessage(error));
+                alert(getTranslatedApiErrorMessage(t, error));
                 navigate('/login');
             }
             else {
@@ -65,7 +66,7 @@ export default function ShowPumpAuto(props) {
             setLoading(false);
         } catch (error) {
             if (isUnauthorized(error)) {
-                alert('Error: ' + getApiErrorMessage(error));
+                alert(getTranslatedApiErrorMessage(t, error));
                 navigate('/login');
             }
             else {
@@ -89,7 +90,7 @@ export default function ShowPumpAuto(props) {
                 setLoading(false);
             } catch (error) {
                 if (isUnauthorized(error)) {
-                    alert('Error: ' + getApiErrorMessage(error));
+                    alert(getTranslatedApiErrorMessage(t, error));
                     navigate('/login');
                 }
                 else {
@@ -105,7 +106,7 @@ export default function ShowPumpAuto(props) {
         const intervalId = setInterval(fetchApiData, 10 * 1000);
 
         return () => clearInterval(intervalId);
-    }, [navigate, sessionID]);
+    }, [navigate, sessionID, t]);
 
     return (
         <div>
@@ -120,8 +121,8 @@ export default function ShowPumpAuto(props) {
             ) : (
                 <div>
                     {
-                        pumpAutos.map((pumpAuto, index) => (
-                            <div key={index} className=''>
+                        pumpAutos.map((pumpAuto) => (
+                            <div key={pumpAuto.id}>
                                 <div className='h-[44px] rounded-full bg-lightGray pl-[var(--spacing-x)] mr-[var(--spacing-x)] mt-[var(--spacing-y)] leading-[44px]'>
                                     {showSettingsIcon ? (
                                         <MdEdit onClick={handleIconClick} className='inline mr-1' cursor={'pointer'} color='black' size={20}/>
@@ -143,7 +144,7 @@ export default function ShowPumpAuto(props) {
                                                 <input className='rounded-full' type="time" value={endTime} onChange={handleEndTimeChange} />
                                             </div>
                                             <div className='float-right'>
-                                                <button className="bg-mainBlue text-center rounded-full min-h-[44px] w-[60px] text-white m-[var(--spacing-x)]" onClick={() => handleSubmit(pumpAuto.id)}>{t('common.ok')}</button>
+                                                <button className={classes.scheduleButton} onClick={() => handleSubmit(pumpAuto.id)}>{t('common.ok')}</button>
                                             </div>
                                             <div className='clear-both'></div>
                                         </div>

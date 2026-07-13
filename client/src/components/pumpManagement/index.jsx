@@ -4,6 +4,7 @@ import ShowPumpAuto from '../showPumpAuto'
 import React, { useState } from 'react';
 import { FormGroup, Typography, Switch, Stack } from '@mui/material';
 import { useI18n } from '../../i18n';
+import { classes } from '../../styles/classes';
 
 export default function PumpInfo(props) {
     const [autoMode, setAutoMode] = useState(false); // State to manage the auto mode
@@ -11,13 +12,13 @@ export default function PumpInfo(props) {
 
     return (
         <div className='md:w-[280px] xl:w-[400px] 2xl:w-[400px]'>
-            <div className='bg-white'>
-                <div name='title-subtitle' className='pl-[var(--spacing-x)] pt-[var(--spacing-y)]'>
+            <div className={classes.panel}>
+                <div name='title-subtitle' className={classes.panelTitle}>
                     <div name='title' className='font-bold'>
                         {t('pump.management')}
                     </div>
                 </div>
-                <hr className="mt-[var(--spacing-section)] border border-solid"></hr>
+                <hr className={classes.separator}></hr>
                 <div className='pl-[var(--spacing-x)] pt-[var(--spacing-y)]'>
                     {t('pump.chooseMode')}
                     <FormGroup>
@@ -35,13 +36,13 @@ export default function PumpInfo(props) {
                 <div>
                     {autoMode && 
                     <div>
-                        <hr className="mt-[var(--spacing-section)] border border-solid"></hr>
+                        <hr className={classes.separator}></hr>
                         <AddPumpAuto api_token={props.api_token}/>
                     </div>
                     }
                 </div>
 
-                <hr className="mt-[var(--spacing-section)] border border-solid"></hr>
+                <hr className={classes.separator}></hr>
                 <PumpState api_token={props.api_token} />
             </div>
         </div>

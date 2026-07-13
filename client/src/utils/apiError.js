@@ -5,3 +5,7 @@ export function isUnauthorized(error) {
 export function getApiErrorMessage(error) {
   return error?.response?.data?.message || error?.response?.data?.error || error.message;
 }
+
+export function getTranslatedApiErrorMessage(t, error) {
+  return `${t("common.error")}: ${getApiErrorMessage(error)}`;
+}

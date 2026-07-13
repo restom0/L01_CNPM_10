@@ -5,7 +5,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import { DUMMY_PUMP_STATE } from '../../data/dummyData';
-import { getApiErrorMessage, isUnauthorized } from '../../utils/apiError';
+import { getTranslatedApiErrorMessage, isUnauthorized } from '../../utils/apiError';
 import { useI18n } from '../../i18n';
 
 export default function PumpState(props) {
@@ -23,11 +23,11 @@ export default function PumpState(props) {
                     }
                 };
                 const pumpResponse = await axios.get(`http://localhost:3001/waterpumps`, config);
-                setPumpState((pumpResponse.data.data.value == "OFF") ? false : true)
+                setPumpState(pumpResponse.data.data.value !== "OFF")
                 setLoading(false);
             } catch (error) {
                 if (isUnauthorized(error)) {
-                    alert('Error: ' + getApiErrorMessage(error));
+                    alert(getTranslatedApiErrorMessage(t, error));
                     navigate('/login');
                 }
                 else {
@@ -43,7 +43,7 @@ export default function PumpState(props) {
         const intervalId = setInterval(fetchApiData, 10 * 1000);
 
         return () => clearInterval(intervalId);
-    }, [navigate, sessionID]);
+    }, [navigate, sessionID, t]);
     const handleSwitchChange = async () => {
         try {
             const apiEndpoint = pumpState ? "http://localhost:3001/waterpumps/manual/off" : "http://localhost:3001/waterpumps/manual/on";
@@ -51,7 +51,7 @@ export default function PumpState(props) {
             await axios.post(apiEndpoint, {}, { headers: { Authorization: "Bearer " + sessionID } });
         } catch (error) {
             if (isUnauthorized(error)) {
-                alert('Error: ' + getApiErrorMessage(error));
+                alert(getTranslatedApiErrorMessage(t, error));
                 navigate('/login');
             }
             else {

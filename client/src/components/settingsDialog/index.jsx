@@ -3,6 +3,7 @@ import { IoClose } from "react-icons/io5";
 import LanguageSwitcher from "../languageSwitcher";
 import ThemeSwitcher from "../themeSwitcher";
 import { useI18n } from "../../i18n";
+import { classes } from "../../styles/classes";
 
 export default function SettingsDialog({ open, onClose }) {
   const { t } = useI18n();
@@ -20,7 +21,7 @@ export default function SettingsDialog({ open, onClose }) {
               type="button"
               onClick={onClose}
               aria-label={t("common.cancel")}
-              className="rounded-md p-1 text-textGray outline-none hover:text-mainBlue focus-visible:ring-2 focus-visible:ring-mainBlue"
+              className={classes.dialogIconButton}
             >
               <IoClose size={22} />
             </button>

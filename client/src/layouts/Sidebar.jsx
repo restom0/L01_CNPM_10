@@ -1,11 +1,11 @@
 import React from 'react'
 import classNames from 'classnames'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { HiHome, HiChartBar, HiLogout} from 'react-icons/hi'
 import { IoBuild } from 'react-icons/io5'
 import { HiDocument } from 'react-icons/hi2'
-import { useNavigate } from 'react-router-dom';
 import { useI18n } from '../i18n';
+import { getTranslatedApiErrorMessage } from '../utils/apiError';
 
 const DASHBOARD_SIDEBAR_LINKS = [
 	{
@@ -67,7 +67,7 @@ export default function Sidebar() {
             localStorage.removeItem('sessionID');
             navigate('/login');
         }catch (error) {
-            alert(error);
+            alert(getTranslatedApiErrorMessage(t, error));
         }
     };
 	return (

@@ -6,6 +6,7 @@ import {
 } from "@headlessui/react";
 import { IoChevronDown } from "react-icons/io5";
 import { useI18n } from "../../i18n";
+import { classes } from "../../styles/classes";
 
 export default function LanguageSwitcher() {
   const { language, languages, setLanguage, t } = useI18n();
@@ -15,7 +16,7 @@ export default function LanguageSwitcher() {
     <Listbox value={language} onChange={setLanguage}>
       <ListboxButton
         aria-label={t("language.label")}
-        className="flex min-h-[44px] items-center gap-x-[calc(var(--spacing-x)/2)] rounded-md bg-white px-[var(--spacing-x)] text-sm font-semibold text-textGray shadow-sm ring-1 ring-black/5 outline-none hover:ring-mainBlue/40 focus-visible:ring-2 focus-visible:ring-mainBlue"
+        className={classes.toolbarButton}
       >
         <span>
           {current.flag} {current.countryCode}

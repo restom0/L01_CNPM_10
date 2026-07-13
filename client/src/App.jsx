@@ -20,7 +20,6 @@ function App() {
           <Route path="chart" element={<Chart />} />
           <Route path="log" element={<Log />} />
           <Route path="setting" element={<Setting />} />
-          <Route path="log" element={<Log />} />
           {/* <Route path="user" element={<User />} /> */}
         </Route>
       </Routes>

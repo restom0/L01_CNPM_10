@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import jwt from 'jsonwebtoken'
-import { createApiKey } from './useApiKey.js'
 
-const SECRET = process.env.JWT_SECRET || 'secret'
+const SECRET = `test-jwt-${Date.now()}`
+process.env.JWT_SECRET = SECRET
+const { createApiKey } = await import('./useApiKey.js')
+const wrongSecret = `wrong-${Date.now()}`
 
 describe('createApiKey (UT)', () => {
   it('produces a token that verifies with the signing secret and carries the payload', () => {
@@ -22,6 +24,6 @@ describe('createApiKey (UT)', () => {
 
   it('fails verification against a wrong secret', () => {
     const token = createApiKey('abc')
-    expect(() => jwt.verify(token, 'wrong-secret')).toThrow()
+    expect(() => jwt.verify(token, wrongSecret)).toThrow()
   })
 })

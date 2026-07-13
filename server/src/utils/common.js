@@ -7,8 +7,7 @@ function checkNullOrUndefined (...args) {
   return false
 }
 function compareThreshold (value, upper, lower) {
-  if (value >= lower && value <= upper) return false
-  return true
+  return !(value >= lower && value <= upper)
 }
 export const CommonUtils = {
   checkNullOrUndefined,

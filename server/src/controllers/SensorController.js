@@ -3,7 +3,7 @@ import { NotFoundError } from '../errors/notFound.error.js'
 import { SensorService } from '../services/SensorService.js'
 import { CommonUtils } from '../utils/common.js'
 
-const getAllHumidityValue = async (req, res, next) => {
+const getAllHumidityValue = async (req, res) => {
   try {
     const result = await SensorService.getAllHumidityValue(req.user.id)
     res.status(200).json({ data: result })
@@ -12,7 +12,7 @@ const getAllHumidityValue = async (req, res, next) => {
   }
 }
 
-const getAllLightValue = async (req, res, next) => {
+const getAllLightValue = async (req, res) => {
   try {
     const result = await SensorService.getAllLightValue(req.user.id)
     res.status(200).json({ data: result })
@@ -21,7 +21,7 @@ const getAllLightValue = async (req, res, next) => {
   }
 }
 
-const getAllTemperatureValue = async (req, res, next) => {
+const getAllTemperatureValue = async (req, res) => {
   try {
     const result = await SensorService.getAllTemperatureValue(req.user.id)
     res.status(200).json({ data: result })
@@ -30,7 +30,7 @@ const getAllTemperatureValue = async (req, res, next) => {
   }
 }
 
-const getAllMoistureValue = async (req, res, next) => {
+const getAllMoistureValue = async (req, res) => {
   try {
     const result = await SensorService.getAllMoistureValue(req.user.id)
     res.status(200).json({ data: result })
@@ -38,7 +38,7 @@ const getAllMoistureValue = async (req, res, next) => {
     res.status(error.statusCode).json({ error: error.message })
   }
 }
-const getAllEnvironmentValue = async (req, res, next) => {
+const getAllEnvironmentValue = async (req, res) => {
   try {
     const result = await SensorService.getAllEnvironmentValue(req.user.id)
     res.status(200).json({ data: result })
@@ -46,7 +46,7 @@ const getAllEnvironmentValue = async (req, res, next) => {
     res.status(500).json({ error: error.message })
   }
 }
-const getLastHumidityValue = async (req, res, next) => {
+const getLastHumidityValue = async (req, res) => {
   try {
     const result = await SensorService.getLastHumidityValue(req.user.mqtt, req.user.id)
     res.status(200).json({
@@ -60,7 +60,7 @@ const getLastHumidityValue = async (req, res, next) => {
   }
 }
 
-const getLastLightValue = async (req, res, next) => {
+const getLastLightValue = async (req, res) => {
   try {
     const result = await SensorService.getLastLightValue(req.user.mqtt, req.user.id)
     res.status(200).json({
@@ -74,7 +74,7 @@ const getLastLightValue = async (req, res, next) => {
   }
 }
 
-const getLastTemperatureValue = async (req, res, next) => {
+const getLastTemperatureValue = async (req, res) => {
   try {
     const result = await SensorService.getLastTemperatureValue(req.user.mqtt, req.user.id)
     if (CommonUtils.checkNullOrUndefined(result)) {
@@ -91,7 +91,7 @@ const getLastTemperatureValue = async (req, res, next) => {
   }
 }
 
-const getLastMoistureValue = async (req, res, next) => {
+const getLastMoistureValue = async (req, res) => {
   try {
     const result = await SensorService.getLastMoistureValue(req.user.mqtt, req.user.id)
     res.status(200).json({
@@ -104,14 +104,14 @@ const getLastMoistureValue = async (req, res, next) => {
     res.status(error.statusCode).json({ error: error.message })
   }
 }
-const getLastEnvironmentValue = async (req, res, next) => {
+const getLastEnvironmentValue = async (req, res) => {
   try {
     const result = await SensorService.getLastEnvironmentValue(req.user.key, req.user.mqtt, req.user.id)
     if (result) {
       res.status(200).json({ data: result })
     }
   } catch (error) {
-    res.status(200).json({ message: 'ok' })
+    res.status(error.statusCode || 500).json({ error: error.message })
   }
 }
 
@@ -125,7 +125,7 @@ const getLightThreshold = async (req, res, next) => {
   }
 }
 
-const updateLightThreshold = async (req, res, next) => {
+const updateLightThreshold = async (req, res) => {
   try {
     let { upper, lower } = req.query
     if (CommonUtils.checkNullOrUndefined(upper)) {
@@ -156,7 +156,7 @@ const getTemperatureThreshold = async (req, res, next) => {
   }
 }
 
-const updateTemperatureThreshold = async (req, res, next) => {
+const updateTemperatureThreshold = async (req, res) => {
   try {
     let { upper, lower } = req.query
     if (CommonUtils.checkNullOrUndefined(upper)) {
@@ -187,7 +187,7 @@ const getHumidityThreshold = async (req, res, next) => {
   }
 }
 
-const updateHumidityThreshold = async (req, res, next) => {
+const updateHumidityThreshold = async (req, res) => {
   try {
     let { upper, lower } = req.query
     if (CommonUtils.checkNullOrUndefined(upper)) {
@@ -218,7 +218,7 @@ const getMoistureThreshold = async (req, res, next) => {
   }
 }
 
-const updateMoistureThreshold = async (req, res, next) => {
+const updateMoistureThreshold = async (req, res) => {
   try {
     let { upper, lower } = req.query
     if (CommonUtils.checkNullOrUndefined(upper)) {

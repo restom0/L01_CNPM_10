@@ -5,6 +5,8 @@ export default defineConfig({
     environment: 'node',
     globals: true,
     include: ['src/**/*.test.js', 'test/**/*.test.js'],
+    fileParallelism: false,
+    maxWorkers: 1,
     // mongodb-memory-server downloads a binary on first run; give it room.
     testTimeout: 20000,
     hookTimeout: 60000,

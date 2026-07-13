@@ -3,7 +3,7 @@ export const logRequestMethod = (req, res, next) => {
   const path = req.path
 
   if (path.startsWith('/teachers/')) {
-    console.log(`Request method for ${path}: ${method}`)
+    console.log(`Teacher route request method: ${method}`)
   }
 
   next()

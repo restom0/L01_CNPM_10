@@ -3,8 +3,9 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { IoMdSettings } from 'react-icons/io';
 import { MdCancel } from 'react-icons/md';
-import { getApiErrorMessage, isUnauthorized } from '../../utils/apiError';
+import { getTranslatedApiErrorMessage, isUnauthorized } from '../../utils/apiError';
 import { useI18n } from '../../i18n';
+import { classes } from '../../styles/classes';
 
 export default function AddPumpAuto(props) {
     const [showModal, setShowModal] = useState(false);
@@ -41,7 +42,7 @@ export default function AddPumpAuto(props) {
             alert(t('pump.addAutoSuccess'));
         } catch (error) {
             if (isUnauthorized(error)) {
-                alert('Error: ' + getApiErrorMessage(error));
+                alert(getTranslatedApiErrorMessage(t, error));
                 navigate('/login');
             }
             else {
@@ -74,7 +75,7 @@ export default function AddPumpAuto(props) {
                             <input className='rounded-full' type="time" value={endTime} onChange={handleEndTimeChange} />
                         </div>
                         <div className='float-right'>
-                            <button className="bg-mainBlue text-center rounded-full min-h-[44px] w-[60px] text-white m-[var(--spacing-x)]" onClick={handleSubmit}>{t('common.ok')}</button>
+                            <button className={classes.scheduleButton} onClick={handleSubmit}>{t('common.ok')}</button>
                         </div>
                         <div className='clear-both'></div>
                     </div>

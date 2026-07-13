@@ -4,8 +4,9 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { useNavigate } from 'react-router-dom';
 import { DUMMY_LOGS } from '../../data/dummyData';
-import { getApiErrorMessage, isUnauthorized } from '../../utils/apiError';
+import { getTranslatedApiErrorMessage, isUnauthorized } from '../../utils/apiError';
 import { useI18n } from '../../i18n';
+import { classes } from '../../styles/classes';
 
 function formatTime(dateString) {
     const date = new Date(dateString);
@@ -33,7 +34,7 @@ export default function SeHistory() {
 					navigate('/login');
 				}
                 else{
-                    var newDate=new Date(value);
+                    const newDate = new Date(value);
                     if (hasLoadedInitialDate.current){
                         newDate.setDate(newDate.getDate() + 1);
                     }
@@ -53,7 +54,7 @@ export default function SeHistory() {
                 }
             } catch (error) {
                 if (isUnauthorized(error)) {
-                    alert('Error: ' + getApiErrorMessage(error));
+                    alert(getTranslatedApiErrorMessage(t, error));
                     navigate('/login');
                 }
                 else {
@@ -63,21 +64,21 @@ export default function SeHistory() {
             }
         };
         fetchData();
-    }, [navigate, sessionID, value]);
+    }, [navigate, sessionID, t, value]);
     return (
         <div className="flex flex-col md:flex-row md:items-start justify-center gap-[var(--spacing-section)] pt-[var(--spacing-section)] px-[var(--spacing-body)]">
-            <div className="w-full max-w-[360px] bg-white rounded-xl shadow-sm p-[var(--spacing-y)]">
+            <div className={`w-full max-w-[360px] ${classes.panel} p-[var(--spacing-y)]`}>
                 <Calendar onChange={GetDate} value={value} className="app-calendar" />
             </div>
-            <div className="w-full md:flex-1 md:max-w-[760px] h-[450px] bg-white rounded-xl shadow-sm p-[var(--spacing-section)] overflow-auto">
+            <div className={`w-full md:flex-1 md:max-w-[760px] h-[450px] ${classes.panel} p-[var(--spacing-section)] overflow-auto`}>
                 <p className="font-bold text-textGray 2xl:text-xl">{t('log.title')}</p>
                 <hr className="h-px my-[var(--spacing-x)] bg-gray-200 border-0" />
                 <div>
                     {logData.length === 0 ? (
                         <p className="py-[var(--spacing-x)] text-textGray xl:text-base 2xl:text-lg">{t('log.noDateData')}</p>
                     ) : (
-                        logData.map((item,index)=>(
-                            <p key={index} className="py-[var(--spacing-x)] text-textGray xl:text-base 2xl:text-lg"> {item.time}: {item.activity} </p>
+                        logData.map((item)=>(
+                            <p key={`${item.time}-${item.activity}`} className="py-[var(--spacing-x)] text-textGray xl:text-base 2xl:text-lg"> {item.time}: {item.activity} </p>
                         ))
                     )}
                 </div>
