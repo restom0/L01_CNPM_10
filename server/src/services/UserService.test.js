@@ -42,6 +42,16 @@ describe('UserService.register (IT)', () => {
 })
 
 describe('UserService.login (IT)', () => {
+  it('rejects operator-shaped credentials before querying', async () => {
+    const mongoOperator = '$ne'
+    await expect(
+      UserService.login({ [mongoOperator]: null }, sample.password)
+    ).rejects.toBeInstanceOf(BadRequestError)
+    await expect(
+      UserService.login(sample.username, { [mongoOperator]: null })
+    ).rejects.toBeInstanceOf(BadRequestError)
+  })
+
   it('returns the user for correct credentials', async () => {
     await UserService.register(sample.username, sample.password, sample.mqttUsername, sample.aioKey)
     const found = await UserService.login('alice', sample.password)

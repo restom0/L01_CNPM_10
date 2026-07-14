@@ -12,7 +12,13 @@ const login = async (inputUserName, inputPassword) => {
   if (typeof inputPassword !== 'string') {
     throw new BadRequestError('Password must be a string')
   }
-  return await UserModel.findOne({ username: inputUserName, password: inputPassword }).exec()
+  return await UserModel
+    .findOne()
+    .where('username')
+    .equals(inputUserName)
+    .where('password')
+    .equals(inputPassword)
+    .exec()
 }
 const register = async (username, password, mqttUsername, aioKey) => {
   if (typeof username !== 'string') {
@@ -27,7 +33,12 @@ const register = async (username, password, mqttUsername, aioKey) => {
   if (typeof aioKey !== 'string') {
     throw new BadRequestError('Key must be a string')
   }
-  if (await UserModel.findOne({ username })) {
+  const existingUser = await UserModel
+    .findOne()
+    .where('username')
+    .equals(username)
+    .exec()
+  if (existingUser) {
     throw new BadRequestError('Account existed')
   }
   const user = new UserModel({
