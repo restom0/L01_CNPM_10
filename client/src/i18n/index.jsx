@@ -591,10 +591,10 @@ const I18nContext = createContext({
 });
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguageState] = useState(defaultLanguage);
+  const [language, setLanguage] = useState(defaultLanguage);
 
-  const setLanguage = (nextLanguage) => {
-    setLanguageState(nextLanguage);
+  const updateLanguage = (nextLanguage) => {
+    setLanguage(nextLanguage);
     if (typeof window !== "undefined" && window.localStorage) {
       window.localStorage.setItem(STORAGE_KEY, nextLanguage);
     }
@@ -604,7 +604,7 @@ export function LanguageProvider({ children }) {
     () => ({
       language,
       languages: LANGUAGES,
-      setLanguage,
+      setLanguage: updateLanguage,
       t: (key) => translations[language]?.[key] || translations.vi[key] || key,
     }),
     [language]

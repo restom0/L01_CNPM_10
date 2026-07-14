@@ -37,15 +37,15 @@ const ThemeContext = createContext({
 });
 
 export function ThemeProvider({ children }) {
-  const [theme, setThemeState] = useState(getStoredTheme);
+  const [theme, setTheme] = useState(getStoredTheme);
 
   useEffect(() => {
     applyTheme(theme);
   }, [theme]);
 
   const value = useMemo(() => {
-    const setTheme = (next) => {
-      setThemeState(next);
+    const updateTheme = (next) => {
+      setTheme(next);
       try {
         window.localStorage?.setItem(STORAGE_KEY, next);
       } catch {
@@ -54,8 +54,8 @@ export function ThemeProvider({ children }) {
     };
     return {
       theme,
-      setTheme,
-      toggleTheme: () => setTheme(theme === "dark" ? "light" : "dark"),
+      setTheme: updateTheme,
+      toggleTheme: () => updateTheme(theme === "dark" ? "light" : "dark"),
     };
   }, [theme]);
 
