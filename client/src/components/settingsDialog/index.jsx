@@ -5,6 +5,12 @@ import ThemeSwitcher from "../themeSwitcher";
 import { useI18n } from "../../i18n";
 import { classes } from "../../styles/classes";
 
+/**
+ * Render settings side drawer for language and theme controls.
+ *
+ * @param {{open: boolean, onClose: Function}} props - Dialog state props.
+ * @returns {JSX.Element} Settings dialog.
+ */
 export default function SettingsDialog({ open, onClose }) {
   const { t } = useI18n();
 

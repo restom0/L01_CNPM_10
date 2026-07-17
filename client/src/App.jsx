@@ -9,6 +9,11 @@ import Signup from "./pages/signup";
 import Log from "./pages/log";
 // import User from "./pages/user";
 
+/**
+ * Declare client routes and app layout.
+ *
+ * @returns {JSX.Element} App router.
+ */
 function App() {
   return (
     <Router>

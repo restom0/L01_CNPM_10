@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import {CircularProgress} from '@mui/material';
 import { MdCancel, MdEdit } from 'react-icons/md';
@@ -7,7 +6,18 @@ import { DUMMY_PUMP_AUTOS } from '../../data/dummyData';
 import { getTranslatedApiErrorMessage, isUnauthorized } from '../../utils/apiError';
 import { useI18n } from '../../i18n';
 import { classes } from '../../styles/classes';
+import {
+    deleteWaterPumpTimer,
+    listWaterPumpTimers,
+    updateWaterPumpTimer,
+} from '../../services/apiService';
 
+/**
+ * Render automatic watering timer list and edit controls.
+ *
+ * @param {{api_token: string}} props - Auth token props.
+ * @returns {JSX.Element} Timer list.
+ */
 export default function ShowPumpAuto(props) {
     const [pumpAutos, setPumpAutos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -19,27 +29,45 @@ export default function ShowPumpAuto(props) {
     const navigate = useNavigate();
     const { t } = useI18n();
 
+    /**
+     * Store selected start time.
+     *
+     * @param {React.ChangeEvent<HTMLInputElement>} e - Input event.
+     * @returns {void}
+     */
     const handleStartTimeChange = (e) => {
         setStartTime(e.target.value);
     };
 
+    /**
+     * Store selected end time.
+     *
+     * @param {React.ChangeEvent<HTMLInputElement>} e - Input event.
+     * @returns {void}
+     */
     const handleEndTimeChange = (e) => {
         setEndTime(e.target.value);
     };
 
+    /**
+     * Toggle edit timer modal.
+     *
+     * @returns {void}
+     */
     const handleIconClick = () => {
         setShowModal(!showModal);
         setShowSettingsIcon(!showSettingsIcon);
     };
 
+    /**
+     * Submit timer update to API.
+     *
+     * @param {string} id - Timer id.
+     * @returns {Promise<void>}
+     */
     const handleSubmit = async (id) => {
         try {
-            const config = {
-                headers: {
-                    Authorization: "Bearer " + sessionID,
-                }
-            };
-            await axios.put(`http://localhost:3001/waterpumps/auto/` + id, {'startTime':startTime,'endTime':endTime}, config);
+            await updateWaterPumpTimer(sessionID, id, startTime, endTime);
             alert(t('pump.editAutoSuccess'));
         } catch (error) {
             if (isUnauthorized(error)) {
@@ -53,15 +81,16 @@ export default function ShowPumpAuto(props) {
     };
 
 
+    /**
+     * Delete timer from API and local list.
+     *
+     * @param {string} id - Timer id.
+     * @returns {Promise<void>}
+     */
     const deletePumpAuto = async (id) => {
         setLoading(true);
         try {
-            const config = {
-                headers: {
-                    Authorization: "Bearer " + sessionID,
-                }
-            };
-            await axios.delete(`http://localhost:3001/waterpumps/auto/` + id, config);
+            await deleteWaterPumpTimer(sessionID, id);
             setPumpAutos((current) => current.filter((pumpAuto) => pumpAuto.id !== id));
             setLoading(false);
         } catch (error) {
@@ -78,14 +107,14 @@ export default function ShowPumpAuto(props) {
     }
 
     useEffect(() => {
+        /**
+         * Fetch automatic watering timers.
+         *
+         * @returns {Promise<void>}
+         */
         const fetchApiData = async () => {
             try {
-                const config = {
-                    headers: {
-                        Authorization: "Bearer " + sessionID,
-                    }
-                };
-                const pumpAutosResponse = await axios.get(`http://localhost:3001/waterpumps/auto`, config);
+                const pumpAutosResponse = await listWaterPumpTimers(sessionID);
                 setPumpAutos(pumpAutosResponse.data.data);
                 setLoading(false);
             } catch (error) {

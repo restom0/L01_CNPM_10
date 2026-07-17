@@ -4,6 +4,13 @@ import { createApiKey } from '../middlewares/useApiKey.js'
 import { UserService } from '../services/UserService.js'
 import { CommonUtils } from '../utils/common.js'
 
+/**
+ * Handle POST /login, authenticate credentials, and issue API token cookie.
+ *
+ * @param {import('express').Request} req - Request with username and password.
+ * @param {import('express').Response} res - Express response.
+ * @returns {Promise<void>}
+ */
 const login = async (req, res) => {
   try {
     const { username, password } = req.body
@@ -29,10 +36,26 @@ const login = async (req, res) => {
     res.status(error.statusCode).json({ error: error.message })
   }
 }
+
+/**
+ * Handle POST /logout and clear API token cookie.
+ *
+ * @param {import('express').Request} req - Express request.
+ * @param {import('express').Response} res - Express response.
+ * @returns {Promise<void>}
+ */
 const logout = async (req, res) => {
   res.clearCookie('token')
   res.status(200).json({ data: 'Logged out' })
 }
+
+/**
+ * Handle POST /register and create a new user account.
+ *
+ * @param {import('express').Request} req - Request with account and Adafruit IO details.
+ * @param {import('express').Response} res - Express response.
+ * @returns {Promise<void>}
+ */
 const register = async (req, res) => {
   try {
     const { username, password, mqttUsername, aioKey } = req.body

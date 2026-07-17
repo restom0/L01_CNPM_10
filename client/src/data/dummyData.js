@@ -1,5 +1,11 @@
 const now = new Date();
 
+/**
+ * Build ISO timestamp offset from current time.
+ *
+ * @param {number} minutes - Minutes before now.
+ * @returns {string} ISO timestamp.
+ */
 function minutesAgo(minutes) {
   return new Date(now.getTime() - minutes * 60 * 1000).toISOString();
 }

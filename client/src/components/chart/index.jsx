@@ -2,20 +2,45 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {CircularProgress} from '@mui/material';
 import { Chart } from 'react-google-charts';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { DUMMY_CHART_SERIES } from '../../data/dummyData';
 import { getTranslatedApiErrorMessage, isUnauthorized } from '../../utils/apiError';
 import { useI18n } from '../../i18n';
 import { classes } from '../../styles/classes';
+import {
+    getEnvironmentDrynessChart,
+    getHumidityChart,
+    getLightChart,
+    getMoistureChart,
+    getTemperatureChart,
+} from '../../services/apiService';
 
+/**
+ * Convert API date text to Date object for Google Charts.
+ *
+ * @param {string} str - API date text.
+ * @returns {Date} Parsed date.
+ */
 function toDate(str) {
     return new Date(str);
 }
 
+/**
+ * Render sensor and environmental dryness history charts.
+ *
+ * @param {{api_token: string}} props - Auth token props.
+ * @returns {JSX.Element} Chart list.
+ */
 export default function Charts(props) {
     const navigate = useNavigate();
     const sessionID = props.api_token;
     const { t, language } = useI18n();
+    /**
+     * Convert API series to Google Charts rows.
+     *
+     * @param {Array<{data: number|string, Date: string}>} series - API series.
+     * @param {string} unit - Value column label.
+     * @returns {Array<Array<unknown>>} Google Charts data.
+     */
     const makeChartData = useCallback((series, unit) => [
         [{ type: "date", label: t("chart.time") }, unit],
         ...series.map(({data, Date: dateValue}) => [toDate(dateValue), Number.parseFloat(data)]),
@@ -32,30 +57,30 @@ export default function Charts(props) {
     const [processedED, setProcessedED] = useState(() => makeChartData([], ""));
 
     useEffect(() => {
+        /**
+         * Fetch all chart series and update processed chart state.
+         *
+         * @returns {Promise<void>}
+         */
         const fetchData = async () => {
             try {
-                const config = {
-                    headers: {
-                        Authorization: "Bearer " + sessionID,
-                    }
-                };
-                const tempResponse = await axios.get(`http://localhost:3001/sensors/chart/temp`, config);
+                const tempResponse = await getTemperatureChart(sessionID);
                 setProcessedTemp(makeChartData(tempResponse.data.data, "°C"));
                 setTempLoading(false);
 
-                const lightResponse = await axios.get(`http://localhost:3001/sensors/chart/light`, config);
+                const lightResponse = await getLightChart(sessionID);
                 setProcessedLight(makeChartData(lightResponse.data.data, "lux"));
                 setLightLoading(false);
 
-                const humidResponse = await axios.get(`http://localhost:3001/sensors/chart/humid`, config);
+                const humidResponse = await getHumidityChart(sessionID);
                 setProcessedHumid(makeChartData(humidResponse.data.data, "%"));
                 setHumidLoading(false);
 
-                const moistureResponse = await axios.get(`http://localhost:3001/sensors/chart/moisture`, config);
+                const moistureResponse = await getMoistureChart(sessionID);
                 setProcessedMoisture(makeChartData(moistureResponse.data.data, "%"));
                 setMoistureLoading(false);
                 
-                const environmentDrynessResponse = await axios.get(`http://localhost:3001/sensors/chart/ed`, config);
+                const environmentDrynessResponse = await getEnvironmentDrynessChart(sessionID);
                 setProcessedED(makeChartData(environmentDrynessResponse.data.data, ""));
                 setEnvironmentDrynessLoading(false);
             } catch (error) {

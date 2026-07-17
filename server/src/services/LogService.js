@@ -1,5 +1,12 @@
 import { LogModel } from '../models/Logs.js'
 
+/**
+ * Get log records for one UTC calendar day and one user.
+ *
+ * @param {string|Date} date - Day used to build the UTC date range.
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<Array<object>>} Log records inside the day.
+ */
 const getDataOnDate = async (date, id) => {
   const start = new Date(date)
   start.setUTCDate(start.getUTCDate())

@@ -4,6 +4,12 @@ import React from 'react';
 import { useI18n } from '../../i18n';
 import { classes } from '../../styles/classes';
 
+/**
+ * Render pump information card.
+ *
+ * @param {{api_token: string}} props - Auth token props.
+ * @returns {JSX.Element} Pump info card.
+ */
 export default function PumpInfo(props) {
     const { t } = useI18n();
     

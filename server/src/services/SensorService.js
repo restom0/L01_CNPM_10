@@ -9,25 +9,64 @@ import { NotFoundError } from '../errors/notFound.error.js'
 import { EnvironmentalDrynessModel } from '../models/EnvironmentalDryness.js'
 import { WaterPumpService } from './WaterPumpService.js'
 import mongoose from 'mongoose'
+
+/**
+ * Get all saved humidity records for one user.
+ *
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<Array<object>>} Humidity sensor records.
+ */
 const getAllHumidityValue = async (id) => {
   return await HumidityModel.find({ userID: id })
 }
 
+/**
+ * Get all saved light records for one user.
+ *
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<Array<object>>} Light sensor records.
+ */
 const getAllLightValue = async (id) => {
   return await LightModel.find({ userID: id })
 }
 
+/**
+ * Get all saved temperature records for one user.
+ *
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<Array<object>>} Temperature sensor records.
+ */
 const getAllTemperatureValue = async (id) => {
   return await TemperatureModel.find({ userID: id })
 }
 
+/**
+ * Get all saved soil moisture records for one user.
+ *
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<Array<object>>} Moisture sensor records.
+ */
 const getAllMoistureValue = async (id) => {
   return await MoistureModel.find({ userID: id })
 }
+
+/**
+ * Get all saved environmental dryness records for one user.
+ *
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<Array<object>>} Environmental dryness records.
+ */
 const getAllEnvironmentValue = async (id) => {
   return await EnvironmentalDrynessModel.find({ userID: id })
 }
 
+/**
+ * Read latest humidity value from Adafruit IO.
+ *
+ * @param {string} mqtt - Adafruit IO username.
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<{value: string, created_at: string}>} Latest humidity feed value.
+ */
 const getLastHumidityValue = async (mqtt, id) => {
   const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
@@ -39,6 +78,13 @@ const getLastHumidityValue = async (mqtt, id) => {
   return { value: result.data[0].value, created_at: result.data[0].created_at }
 }
 
+/**
+ * Read latest light value from Adafruit IO.
+ *
+ * @param {string} mqtt - Adafruit IO username.
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<{value: string, created_at: string}>} Latest light feed value.
+ */
 const getLastLightValue = async (mqtt, id) => {
   const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
@@ -50,6 +96,13 @@ const getLastLightValue = async (mqtt, id) => {
   return { value: result.data[0].value, created_at: result.data[0].created_at }
 }
 
+/**
+ * Read latest temperature value from Adafruit IO.
+ *
+ * @param {string} mqtt - Adafruit IO username.
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<{value: string, created_at: string}>} Latest temperature feed value.
+ */
 const getLastTemperatureValue = async (mqtt, id) => {
   const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
@@ -61,6 +114,13 @@ const getLastTemperatureValue = async (mqtt, id) => {
   return { value: result.data[0].value, created_at: result.data[0].created_at }
 }
 
+/**
+ * Read latest soil moisture value from Adafruit IO.
+ *
+ * @param {string} mqtt - Adafruit IO username.
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<{value: string, created_at: string}>} Latest moisture feed value.
+ */
 const getLastMoistureValue = async (mqtt, id) => {
   const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
@@ -72,6 +132,14 @@ const getLastMoistureValue = async (mqtt, id) => {
   return { value: result.data[0].value, created_at: result.data[0].created_at }
 }
 
+/**
+ * Calculate environmental dryness, save it, and auto-control pump if thresholds require.
+ *
+ * @param {string} key - Adafruit IO key.
+ * @param {string} mqtt - Adafruit IO username.
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<object>} Saved environmental dryness document.
+ */
 const getLastEnvironmentValue = async (key, mqtt, id) => {
   const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
@@ -115,6 +183,13 @@ const getLastEnvironmentValue = async (key, mqtt, id) => {
   await ed.save()
   return ed
 }
+
+/**
+ * Get light threshold bounds for one user.
+ *
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<{upper: number, lower: number}>} Light threshold bounds.
+ */
 const getLightThreshold = async (id) => {
   const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
@@ -123,6 +198,14 @@ const getLightThreshold = async (id) => {
   return { upper: sensor.upperLightThreshold, lower: sensor.lowerLightThreshold }
 }
 
+/**
+ * Update light threshold bounds and derived environmental dryness bounds.
+ *
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @param {number} upper - Upper light threshold.
+ * @param {number} lower - Lower light threshold.
+ * @returns {Promise<void>}
+ */
 const updateLightThreshold = async (id, upper, lower) => {
   const sensor = await SensorModel.findOneAndUpdate(
     { userID: id },
@@ -134,6 +217,12 @@ const updateLightThreshold = async (id, upper, lower) => {
   }
 }
 
+/**
+ * Get temperature threshold bounds for one user.
+ *
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<{upper: number, lower: number}>} Temperature threshold bounds.
+ */
 const getTemperatureThreshold = async (id) => {
   const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
@@ -142,6 +231,14 @@ const getTemperatureThreshold = async (id) => {
   return { upper: sensor.upperTemperatureThreshold, lower: sensor.lowerTemperatureThreshold }
 }
 
+/**
+ * Update temperature threshold bounds and derived environmental dryness bounds.
+ *
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @param {number} upper - Upper temperature threshold.
+ * @param {number} lower - Lower temperature threshold.
+ * @returns {Promise<void>}
+ */
 const updateTemperatureThreshold = async (id, upper, lower) => {
   const sensor = await SensorModel.findOneAndUpdate(
     { userID: id },
@@ -153,6 +250,12 @@ const updateTemperatureThreshold = async (id, upper, lower) => {
   }
 }
 
+/**
+ * Get humidity threshold bounds for one user.
+ *
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<{upper: number, lower: number}>} Humidity threshold bounds.
+ */
 const getHumidityThreshold = async (id) => {
   const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
@@ -161,6 +264,14 @@ const getHumidityThreshold = async (id) => {
   return { upper: sensor.upperHumidityThreshold, lower: sensor.lowerHumidityThreshold }
 }
 
+/**
+ * Update humidity threshold bounds and derived environmental dryness bounds.
+ *
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @param {number} upper - Upper humidity threshold.
+ * @param {number} lower - Lower humidity threshold.
+ * @returns {Promise<void>}
+ */
 const updateHumidityThreshold = async (id, upper, lower) => {
   const sensor = await SensorModel.findOneAndUpdate(
     { userID: id },
@@ -172,6 +283,12 @@ const updateHumidityThreshold = async (id, upper, lower) => {
   }
 }
 
+/**
+ * Get soil moisture threshold bounds for one user.
+ *
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<{upper: number, lower: number}>} Moisture threshold bounds.
+ */
 const getMoistureThreshold = async (id) => {
   const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
@@ -180,6 +297,14 @@ const getMoistureThreshold = async (id) => {
   return { upper: sensor.upperMoistureThreshold, lower: sensor.lowerMoistureThreshold }
 }
 
+/**
+ * Update soil moisture threshold bounds and derived environmental dryness bounds.
+ *
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @param {number} upper - Upper moisture threshold.
+ * @param {number} lower - Lower moisture threshold.
+ * @returns {Promise<void>}
+ */
 const updateMoistureThreshold = async (id, upper, lower) => {
   const sensor = await SensorModel.findOneAndUpdate(
     { userID: id },
@@ -190,6 +315,13 @@ const updateMoistureThreshold = async (id, upper, lower) => {
     throw new NotFoundError('Light sensor not found')
   }
 }
+
+/**
+ * Recalculate environmental dryness thresholds from sensor thresholds.
+ *
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<void>}
+ */
 const updateEnvironmentDrynessThreshold = async (id) => {
   const temp = await getTemperatureThreshold(id)
   const light = await getLightThreshold(id)

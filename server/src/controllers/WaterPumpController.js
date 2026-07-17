@@ -2,6 +2,13 @@ import { BadRequestError } from '../errors/badRequest.error.js'
 import { WaterPumpService } from '../services/WaterPumpService.js'
 import { CommonUtils } from '../utils/common.js'
 
+/**
+ * Validate timer range and normalize HH:mm values.
+ *
+ * @param {string} startTime - Requested start time.
+ * @param {string} endTime - Requested end time.
+ * @returns {{startTime: string, endTime: string}} Valid timer range.
+ */
 const parseTimerRange = (startTime, endTime) => {
   const [startHourText, startMinuteText] = startTime.split(':')
   const [endHourText, endMinuteText] = endTime.split(':')
@@ -33,6 +40,13 @@ const parseTimerRange = (startTime, endTime) => {
   }
 }
 
+/**
+ * Handle GET /waterpumps/auto and list automatic watering timers.
+ *
+ * @param {import('express').Request} req - Request with authenticated user.
+ * @param {import('express').Response} res - Express response.
+ * @returns {Promise<void>}
+ */
 const automaticWatering = async (req, res) => {
   try {
     const result = await WaterPumpService.automaticWatering(req.user.id)
@@ -43,6 +57,14 @@ const automaticWatering = async (req, res) => {
     res.status(error.statusCode).json({ error: error.message })
   }
 }
+
+/**
+ * Handle PUT /waterpumps/auto/:id and update a timer range.
+ *
+ * @param {import('express').Request} req - Request with timer id and time range.
+ * @param {import('express').Response} res - Express response.
+ * @returns {Promise<void>}
+ */
 const updateTimer = async (req, res) => {
   try {
     const { id } = req.params
@@ -63,6 +85,14 @@ const updateTimer = async (req, res) => {
     res.status(error.statusCode).json({ error: error.message })
   }
 }
+
+/**
+ * Handle POST /waterpumps/auto and create a timer range.
+ *
+ * @param {import('express').Request} req - Request with time range.
+ * @param {import('express').Response} res - Express response.
+ * @returns {Promise<void>}
+ */
 const createTimer = async (req, res) => {
   try {
     let { startTime, endTime } = req.body
@@ -79,6 +109,14 @@ const createTimer = async (req, res) => {
     res.status(error.statusCode).json({ error: error.message })
   }
 }
+
+/**
+ * Handle DELETE /waterpumps/auto/:id and delete a timer.
+ *
+ * @param {import('express').Request} req - Request with timer id.
+ * @param {import('express').Response} res - Express response.
+ * @returns {Promise<void>}
+ */
 const deleteTimer = async (req, res) => {
   try {
     const { id } = req.params
@@ -91,6 +129,14 @@ const deleteTimer = async (req, res) => {
     res.status(error.statusCode).json({ error: error.message })
   }
 }
+
+/**
+ * Handle POST /waterpumps/manual/on and turn pump on.
+ *
+ * @param {import('express').Request} req - Request with authenticated user.
+ * @param {import('express').Response} res - Express response.
+ * @returns {Promise<void>}
+ */
 const turnOnPump = async (req, res) => {
   try {
     await WaterPumpService.turnOnPump(req.user.key, req.user.mqtt, req.user.id)
@@ -99,6 +145,14 @@ const turnOnPump = async (req, res) => {
     res.status(error.statusCode).json({ error: error.message })
   }
 }
+
+/**
+ * Handle POST /waterpumps/manual/off and turn pump off.
+ *
+ * @param {import('express').Request} req - Request with authenticated user.
+ * @param {import('express').Response} res - Express response.
+ * @returns {Promise<void>}
+ */
 const turnOffPump = async (req, res) => {
   try {
     await WaterPumpService.turnOffPump(req.user.key, req.user.mqtt, req.user.id)
@@ -107,6 +161,14 @@ const turnOffPump = async (req, res) => {
     res.status(error.statusCode).json({ error: error.message })
   }
 }
+
+/**
+ * Handle GET /waterpumps and return latest pump value.
+ *
+ * @param {import('express').Request} req - Request with authenticated user.
+ * @param {import('express').Response} res - Express response.
+ * @returns {Promise<void>}
+ */
 const getLastWaterPumpValue = async (req, res) => {
   try {
     const result = await WaterPumpService.getLastWaterPumpValue(req.user.mqtt, req.user.id)

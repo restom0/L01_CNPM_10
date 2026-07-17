@@ -3,6 +3,11 @@ import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar';
 import Header from './Header';
 
+/**
+ * Render authenticated shell with sidebar, header, and nested page outlet.
+ *
+ * @returns {JSX.Element} App layout.
+ */
 export default function Layout() {
 	return (
 		<div className="bg-neutral-100 h-screen w-screen m-0 overflow-hidden flex flex-row">

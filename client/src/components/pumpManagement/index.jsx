@@ -6,6 +6,12 @@ import { FormGroup, Typography, Switch, Stack } from '@mui/material';
 import { useI18n } from '../../i18n';
 import { classes } from '../../styles/classes';
 
+/**
+ * Render pump management card with manual and automatic watering modes.
+ *
+ * @param {{api_token: string}} props - Auth token props.
+ * @returns {JSX.Element} Pump management card.
+ */
 export default function PumpInfo(props) {
     const [autoMode, setAutoMode] = useState(false); // State to manage the auto mode
     const { t } = useI18n();

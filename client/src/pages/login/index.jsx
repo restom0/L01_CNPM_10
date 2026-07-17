@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import loginBackground from '../../assets/images/login_background.png';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import LanguageSwitcher from '../../components/languageSwitcher';
 import { useI18n } from '../../i18n';
 import { DUMMY_ADMIN } from '../../data/dummyData';
 import { classes } from '../../styles/classes';
 import { getTranslatedApiErrorMessage } from '../../utils/apiError';
+import { loginUser } from '../../services/apiService';
 
+/**
+ * Render login page and submit credentials.
+ *
+ * @returns {JSX.Element} Login page.
+ */
 export default function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -15,6 +20,11 @@ export default function Login() {
     const demoPassword = import.meta.env.VITE_DEMO_ADMIN_PASSWORD;
     const expiresDate = new Date();
     expiresDate.setDate(expiresDate.getDate() + 3);
+    /**
+     * Validate credentials and login with demo or API auth.
+     *
+     * @returns {Promise<void>}
+     */
     const handleLogin = async () => { 
         try {
             if (username === ''){
@@ -28,7 +38,7 @@ export default function Login() {
                 navigate('/dashboard');
             }
             else {
-                await axios.post(`http://localhost:3001/login`, { username, password });
+                await loginUser(username, password);
                 // The JWT is set by the server in an httpOnly cookie; keep only a
                 // non-sensitive marker so client-side route guards know we're in.
                 localStorage.setItem('sessionID', 'authenticated');

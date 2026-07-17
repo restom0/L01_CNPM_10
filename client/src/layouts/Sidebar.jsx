@@ -1,5 +1,4 @@
 import React from 'react'
-import axios from 'axios'
 import classNames from 'classnames'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { HiHome, HiChartBar, HiLogout} from 'react-icons/hi'
@@ -7,6 +6,7 @@ import { IoBuild } from 'react-icons/io5'
 import { HiDocument } from 'react-icons/hi2'
 import { useI18n } from '../i18n';
 import { getTranslatedApiErrorMessage } from '../utils/apiError';
+import { logoutUser } from '../services/apiService';
 
 const DASHBOARD_SIDEBAR_LINKS = [
 	{
@@ -41,7 +41,12 @@ const DASHBOARD_SIDEBAR_LINKS = [
 	// }
 ]
 
-
+/**
+ * Render one sidebar navigation link.
+ *
+ * @param {{link: {path: string, icon: JSX.Element, labelKey: string}}} props - Link props.
+ * @returns {JSX.Element} Sidebar link.
+ */
 function SidebarLink({ link }) {
 	const { pathname } = useLocation()
 	const { t } = useI18n()
@@ -60,13 +65,23 @@ function SidebarLink({ link }) {
 const linkClass =
 	'flex items-center gap-x-[var(--spacing-x)] px-[var(--spacing-x)] py-[var(--spacing-y)] hover:bg-lightGray hover:no-underline rounded-[8px] text-base font-semibold'
 
+/**
+ * Render main sidebar and logout action.
+ *
+ * @returns {JSX.Element} Sidebar layout.
+ */
 export default function Sidebar() {
 	const { t } = useI18n();
 	const navigate = useNavigate();
+	/**
+	 * Logout from backend when available, then clear local auth marker.
+	 *
+	 * @returns {Promise<void>}
+	 */
 	const handleLogout = async () => {
         try {
             try {
-                await axios.post('http://localhost:3001/logout');
+                await logoutUser();
             } catch {
                 // Offline/demo mode has no backend; clearing the local marker is enough.
             }
@@ -95,4 +110,3 @@ export default function Sidebar() {
 		</div>
 	)
 }
-

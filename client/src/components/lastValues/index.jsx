@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import SensorCard from "../sensorCard";
 import TemperatureCelsiusGood from "../../assets/images/temperature-celsius-good.svg";
@@ -13,7 +12,24 @@ import AirHumidityGood from "../../assets/images/air-humidity-good.svg";
 import { DUMMY_SENSOR_RESPONSES } from "../../data/dummyData";
 import { getTranslatedApiErrorMessage, isUnauthorized } from "../../utils/apiError";
 import { useI18n } from "../../i18n";
+import {
+  calculateEnvironmentDryness,
+  getLatestHumidity,
+  getLatestLight,
+  getLatestMoisture,
+  getLatestTemperature,
+  updateHumidityThreshold,
+  updateLightThreshold,
+  updateMoistureThreshold,
+  updateTemperatureThreshold,
+} from "../../services/apiService";
 
+/**
+ * Format an API timestamp for sensor cards.
+ *
+ * @param {string} inputTime - API timestamp.
+ * @returns {string} Local date-time text.
+ */
 function formatTime(inputTime) {
   const date = new Date(inputTime);
 
@@ -26,6 +42,12 @@ function formatTime(inputTime) {
   return `${hours}:${minutes} ${day}/${month}/${year}`;
 }
 
+/**
+ * Normalize latest sensor API response into card state.
+ *
+ * @param {object} response - API response payload.
+ * @returns {object} Sensor info for display.
+ */
 function toSensorInfo(response) {
   return {
     value: Number.parseFloat(response.data.value),
@@ -36,6 +58,12 @@ function toSensorInfo(response) {
   };
 }
 
+/**
+ * Normalize latest light response and scale lux to gauge percentages.
+ *
+ * @param {object} response - API response payload.
+ * @returns {object} Light info for display.
+ */
 function toLightInfo(response) {
   return {
     ...toSensorInfo(response),
@@ -47,17 +75,36 @@ function toLightInfo(response) {
 
 // Gauge arc inputs: most sensors plot the raw value/thresholds (already 0–100);
 // light is scaled to a percentage of its 0–10000 lux range.
+/**
+ * Return raw gauge arc values for sensors already expressed as 0-100.
+ *
+ * @param {object} info - Sensor info.
+ * @returns {{value: number, lower: number, upper: number}} Gauge arc values.
+ */
 const rawArc = (info) => ({
   value: info.value,
   lower: info.lowerThreshold,
   upper: info.upperThreshold,
 });
+
+/**
+ * Return percent-scaled gauge arc values for light readings.
+ *
+ * @param {object} info - Light sensor info.
+ * @returns {{value: number, lower: number, upper: number}} Gauge arc values.
+ */
 const lightArc = (info) => ({
   value: info.valuePercent,
   lower: info.lowerThresholdPercent,
   upper: info.upperThresholdPercent,
 });
 
+/**
+ * Render latest sensor cards and threshold controls.
+ *
+ * @param {{api_token: string}} props - Auth token props.
+ * @returns {JSX.Element} Latest values section.
+ */
 export default function LastValues(props) {
   const [tempInfo, setTempInfo] = useState(null);
   const [lightInfo, setLightInfo] = useState(null);
@@ -71,6 +118,13 @@ export default function LastValues(props) {
   const sessionID = props.api_token;
   const { t } = useI18n();
 
+  /**
+   * Set one sensor loading state by sensor key.
+   *
+   * @param {string} sensor - Sensor key.
+   * @param {boolean} value - Loading state.
+   * @returns {void}
+   */
   const setSensorLoading = (sensor, value) => {
     if (sensor === "temp") {
       setTempLoading(value);
@@ -84,29 +138,17 @@ export default function LastValues(props) {
   };
 
   useEffect(() => {
+    /**
+     * Fetch latest sensor values and update card state.
+     *
+     * @returns {Promise<void>}
+     */
     const fetchApiData = async () => {
       try {
-        const config = {
-          headers: {
-            Authorization: "Bearer " + sessionID,
-          },
-        };
-        const tempResponse = await axios.get(
-          `http://localhost:3001/sensors/temp`,
-          config
-        );
-        const lightResponse = await axios.get(
-          `http://localhost:3001/sensors/light`,
-          config
-        );
-        const humidResponse = await axios.get(
-          `http://localhost:3001/sensors/humid`,
-          config
-        );
-        const moistureResponse = await axios.get(
-          `http://localhost:3001/sensors/moisture`,
-          config
-        );
+        const tempResponse = await getLatestTemperature(sessionID);
+        const lightResponse = await getLatestLight(sessionID);
+        const humidResponse = await getLatestHumidity(sessionID);
+        const moistureResponse = await getLatestMoisture(sessionID);
         setTempInfo(toSensorInfo(tempResponse.data));
         setTempLoading(false);
         setLightInfo(toLightInfo(lightResponse.data));
@@ -133,14 +175,14 @@ export default function LastValues(props) {
       }
     };
 
+    /**
+     * Ask API to calculate and store environmental dryness.
+     *
+     * @returns {Promise<void>}
+     */
     const fetchEDApiData = async () => {
       try {
-        const config = {
-          headers: {
-            Authorization: "Bearer " + sessionID,
-          },
-        };
-        await axios.get(`http://localhost:3001/sensors/ed`, config);
+        await calculateEnvironmentDryness(sessionID);
       } catch (error) {
         if (isUnauthorized(error)) {
           alert(getTranslatedApiErrorMessage(t, error));
@@ -162,63 +204,45 @@ export default function LastValues(props) {
     };
   }, [navigate, sessionID, t]);
 
+  /**
+   * Submit threshold update when Enter is pressed in a threshold input.
+   *
+   * @param {React.KeyboardEvent<HTMLInputElement>} e - Keyboard event.
+   * @param {string} sensor - Sensor key.
+   * @returns {void}
+   */
   function handleKeyDown(e, sensor) {
     if (e.key === "Enter") {
       e.preventDefault();
       const updateThreshold = async () => {
         try {
-          const config = {
-            headers: {
-              Authorization: "Bearer " + sessionID,
-            },
-          };
           let lower;
           let upper;
-          let apiUrl;
+          let updateThresholdRequest;
 
           if (sensor === "temp") {
             setTempLoading(true);
             lower = tempInfo.lowerThreshold;
             upper = tempInfo.upperThreshold;
+            updateThresholdRequest = updateTemperatureThreshold;
           } else if (sensor === "light") {
             setLightLoading(true);
             lower = lightInfo.lowerThreshold;
             upper = lightInfo.upperThreshold;
+            updateThresholdRequest = updateLightThreshold;
           } else if (sensor === "humid") {
             setHumidLoading(true);
             lower = humidInfo.lowerThreshold;
             upper = humidInfo.upperThreshold;
+            updateThresholdRequest = updateHumidityThreshold;
           } else {
             setMoistureLoading(true);
             lower = moistureInfo.lowerThreshold;
             upper = moistureInfo.upperThreshold;
+            updateThresholdRequest = updateMoistureThreshold;
           }
 
-          if (lower === "" && upper === "") {
-            apiUrl = `http://localhost:3001/sensors/threshold/` + sensor + "?";
-          } else if (lower === "") {
-            apiUrl =
-              `http://localhost:3001/sensors/threshold/` +
-              sensor +
-              "?upper=" +
-              upper;
-          } else if (upper === "") {
-            apiUrl =
-              `http://localhost:3001/sensors/threshold/` +
-              sensor +
-              "?lower=" +
-              lower;
-          } else {
-            apiUrl =
-              `http://localhost:3001/sensors/threshold/` +
-              sensor +
-              "?upper=" +
-              upper +
-              "&lower=" +
-              lower;
-          }
-
-          await axios.put(apiUrl, {}, config);
+          await updateThresholdRequest(sessionID, upper, lower);
           setSensorLoading(sensor, false);
         } catch (error) {
           if (isUnauthorized(error)) {
@@ -235,6 +259,14 @@ export default function LastValues(props) {
     }
   }
 
+  /**
+   * Create a threshold input change handler for one sensor field.
+   *
+   * @param {Function} setInfo - State setter.
+   * @param {object} info - Current sensor info.
+   * @param {string} field - Field to update.
+   * @returns {Function} Change handler.
+   */
   const onThresholdChange = (setInfo, info, field) => (e) =>
     setInfo({
       ...info,

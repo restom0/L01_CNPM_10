@@ -3,11 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import LastValues from '../../components/lastValues';
 import PumpManagement from '../../components/pumpManagement'
 
+/**
+ * Render settings page after auth marker check.
+ *
+ * @returns {JSX.Element} Settings page.
+ */
 export default function Setting() {
 	const sessionID = localStorage.getItem('sessionID');
 	const [loading, setLoading] = useState(true);
 	const navigate = useNavigate();
 	useEffect(() => {
+        /**
+         * Verify local auth marker before showing settings.
+         *
+         * @returns {Promise<void>}
+         */
         const fetchApiData = async () => {
 			try {
 				if (!localStorage.getItem('sessionID')){

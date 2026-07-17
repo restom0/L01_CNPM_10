@@ -8,6 +8,11 @@ import { IoChevronDown } from "react-icons/io5";
 import { useI18n } from "../../i18n";
 import { classes } from "../../styles/classes";
 
+/**
+ * Render language picker and update current language.
+ *
+ * @returns {JSX.Element} Language switcher.
+ */
 export default function LanguageSwitcher() {
   const { language, languages, setLanguage, t } = useI18n();
   const current = languages.find((item) => item.code === language) || languages[0];

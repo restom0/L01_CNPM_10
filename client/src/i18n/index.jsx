@@ -569,6 +569,11 @@ const translations = {
   },
 };
 
+/**
+ * Read saved language from localStorage.
+ *
+ * @returns {string} Language code.
+ */
 function getStoredLanguage() {
   if (typeof window === "undefined" || !window.localStorage) {
     return "vi";
@@ -590,9 +595,21 @@ const I18nContext = createContext({
   t: (key) => translations[defaultLanguage]?.[key] || key,
 });
 
+/**
+ * Provide language state and translation function to app.
+ *
+ * @param {{children: React.ReactNode}} props - Provider children.
+ * @returns {JSX.Element} I18n context provider.
+ */
 export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState(defaultLanguage);
 
+  /**
+   * Save next language to state and localStorage.
+   *
+   * @param {string} nextLanguage - Next language code.
+   * @returns {void}
+   */
   const updateLanguage = (nextLanguage) => {
     setLanguage(nextLanguage);
     if (typeof window !== "undefined" && window.localStorage) {
@@ -613,6 +630,11 @@ export function LanguageProvider({ children }) {
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
+/**
+ * Access current language context.
+ *
+ * @returns {{language: string, languages: Array<object>, setLanguage: Function, t: Function}} I18n context.
+ */
 export function useI18n() {
   return useContext(I18nContext);
 }

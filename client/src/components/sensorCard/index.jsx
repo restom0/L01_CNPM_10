@@ -7,6 +7,12 @@ const GAUGE_THICKNESS = 3;
 
 // A tile's arc offset is its start angle: 90° (12 o'clock) plus the threshold's
 // share of the circle. Kept identical to the original inline formula.
+/**
+ * Convert percentage to CircularProgress rotation.
+ *
+ * @param {number} percent - Percentage around gauge.
+ * @returns {string} CSS rotate value.
+ */
 function arcRotation(percent) {
   return `rotate(${Math.floor(90 + (percent * 360) / 100) + 1}deg)`;
 }
@@ -14,6 +20,12 @@ function arcRotation(percent) {
 // The six stacked CircularProgress rings: three coloured segments (below-lower,
 // in-range, above-upper) over three grey track segments. `av`/`al`/`au` are the
 // value / lower / upper expressed as a percentage of the ring (0–100).
+/**
+ * Render stacked gauge arcs for value and threshold bands.
+ *
+ * @param {{av: number, al: number, au: number, color: string}} props - Gauge props.
+ * @returns {JSX.Element} Gauge arc layers.
+ */
 function GaugeArcs({ av, al, au, color }) {
   // Length of the in-range (middle) coloured segment.
   let inRangeValue = 0;
@@ -73,6 +85,12 @@ function GaugeArcs({ av, al, au, color }) {
   );
 }
 
+/**
+ * Render one threshold number input when data is ready.
+ *
+ * @param {{label: string, value: number|string, onChange: Function, onKeyDown: Function, show: boolean}} props - Field props.
+ * @returns {JSX.Element} Threshold field.
+ */
 function ThresholdField({ label, value, onChange, onKeyDown, show }) {
   return (
     <div>
@@ -95,6 +113,12 @@ function ThresholdField({ label, value, onChange, onKeyDown, show }) {
 // One sensor tile: title, radial gauge, and the lower/upper threshold inputs.
 // `arc(info)` maps the sensor's info to the {value, lower, upper} percentages
 // the gauge draws (raw for most sensors, percent-scaled for light).
+/**
+ * Render one sensor tile with gauge and threshold inputs.
+ *
+ * @param {object} props - Sensor card props.
+ * @returns {JSX.Element} Sensor card.
+ */
 export default function SensorCard({
   title,
   subtitle,

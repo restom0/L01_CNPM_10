@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import loginBackground from '../../assets/images/login_background.png';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import LanguageSwitcher from '../../components/languageSwitcher';
 import { useI18n } from '../../i18n';
 import { classes } from '../../styles/classes';
 import { getTranslatedApiErrorMessage } from '../../utils/apiError';
+import { registerUser } from '../../services/apiService';
 
+/**
+ * Render signup page and submit account registration.
+ *
+ * @returns {JSX.Element} Signup page.
+ */
 export default function Signup() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -15,6 +20,11 @@ export default function Signup() {
     const [aioKey, setAioKey] = useState('');
     const navigate = useNavigate();
     const { t } = useI18n();
+    /**
+     * Return translation key for first validation error.
+     *
+     * @returns {string|null} Error translation key or null.
+     */
     const getValidationErrorKey = () => {
         if (username === '') return 'error.usernameRequired';
         if (password === '') return 'error.passwordRequired';
@@ -23,6 +33,11 @@ export default function Signup() {
         if (password !== rePassword) return 'error.passwordMismatch';
         return null;
     };
+    /**
+     * Validate form and register account through API.
+     *
+     * @returns {Promise<void>}
+     */
     const handleRegister = async () => {
         const validationErrorKey = getValidationErrorKey();
         if (validationErrorKey) {
@@ -30,7 +45,7 @@ export default function Signup() {
             return;
         }
         try {
-            const registerResponse = await axios.post('http://localhost:3001/register', { username, password, mqttUsername, aioKey });
+            const registerResponse = await registerUser(username, password, mqttUsername, aioKey);
             if (registerResponse.data.data === "Register successfully") {
                 alert(t('register.success'));
                 setTimeout(() => {

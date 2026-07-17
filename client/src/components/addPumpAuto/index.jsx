@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { IoMdSettings } from 'react-icons/io';
 import { MdCancel } from 'react-icons/md';
 import { getTranslatedApiErrorMessage, isUnauthorized } from '../../utils/apiError';
 import { useI18n } from '../../i18n';
 import { classes } from '../../styles/classes';
+import { createWaterPumpTimer } from '../../services/apiService';
 
+/**
+ * Render modal control for adding automatic watering timer.
+ *
+ * @param {{api_token: string}} props - Auth token props.
+ * @returns {JSX.Element} Add timer control.
+ */
 export default function AddPumpAuto(props) {
     const [showModal, setShowModal] = useState(false);
     const [startTime, setStartTime] = useState('');
@@ -18,27 +24,44 @@ export default function AddPumpAuto(props) {
     const { t } = useI18n();
 
 
+    /**
+     * Store selected start time.
+     *
+     * @param {React.ChangeEvent<HTMLInputElement>} e - Input event.
+     * @returns {void}
+     */
     const handleStartTimeChange = (e) => {
         setStartTime(e.target.value);
     };
 
+    /**
+     * Store selected end time.
+     *
+     * @param {React.ChangeEvent<HTMLInputElement>} e - Input event.
+     * @returns {void}
+     */
     const handleEndTimeChange = (e) => {
         setEndTime(e.target.value);
     };
 
+    /**
+     * Toggle add timer modal.
+     *
+     * @returns {void}
+     */
     const handleIconClick = () => {
         setShowModal(!showModal);
         setShowSettingsIcon(!showSettingsIcon);
     };
 
+    /**
+     * Submit new timer range to API.
+     *
+     * @returns {Promise<void>}
+     */
     const handleSubmit = async () => {
         try {
-            const config = {
-                headers: {
-                    Authorization: "Bearer " + sessionID,
-                }
-            };
-            await axios.post(`http://localhost:3001/waterpumps/auto`, {'startTime':startTime, 'endTime':endTime}, config);
+            await createWaterPumpTimer(sessionID, startTime, endTime);
             alert(t('pump.addAutoSuccess'));
         } catch (error) {
             if (isUnauthorized(error)) {

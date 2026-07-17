@@ -5,6 +5,13 @@ import { NotFoundError } from '../errors/notFound.error.js'
 import { WaterPumpTimerModel } from '../models/WaterPumpTimers.js'
 import { Types } from 'mongoose'
 
+/**
+ * List saved automatic watering timer ranges for one user.
+ *
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<Array<{id: import('mongoose').Types.ObjectId, startTime: string, endTime: string}>>}
+ * Watering timers.
+ */
 const automaticWatering = async (id) => {
   const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
@@ -17,6 +24,15 @@ const automaticWatering = async (id) => {
   })
   return result
 }
+
+/**
+ * Update an existing watering timer range.
+ *
+ * @param {string} id - Timer id.
+ * @param {string} starttime - Start time in HH:mm format.
+ * @param {string} endtime - End time in HH:mm format.
+ * @returns {Promise<void>}
+ */
 const updateTimer = async (id, starttime, endtime) => {
   const sensor = await WaterPumpTimerModel.findOne({ _id: Types.ObjectId.createFromHexString(id) })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
@@ -26,6 +42,15 @@ const updateTimer = async (id, starttime, endtime) => {
   sensor.endTime = endtime
   await sensor.save()
 }
+
+/**
+ * Create a watering timer for one user.
+ *
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @param {string} starttime - Start time in HH:mm format.
+ * @param {string} endtime - End time in HH:mm format.
+ * @returns {Promise<void>}
+ */
 const createTimer = async (id, starttime, endtime) => {
   const user = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(user)) {
@@ -39,6 +64,13 @@ const createTimer = async (id, starttime, endtime) => {
   })
   await timer.save()
 }
+
+/**
+ * Delete one watering timer.
+ *
+ * @param {string} id - Timer id.
+ * @returns {Promise<void>}
+ */
 const deleteTimer = async (id) => {
   const timer = await WaterPumpTimerModel.findOne({ _id: Types.ObjectId.createFromHexString(id) })
   if (CommonUtils.checkNullOrUndefined(timer)) {
@@ -46,6 +78,15 @@ const deleteTimer = async (id) => {
   }
   await WaterPumpTimerModel.deleteOne({ _id: Types.ObjectId.createFromHexString(id) })
 }
+
+/**
+ * Publish an ON command to the user's Adafruit IO water pump feed.
+ *
+ * @param {string} key - Adafruit IO key.
+ * @param {string} mqtt - Adafruit IO username.
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<void>}
+ */
 const turnOnPump = async (key, mqtt, id) => {
   const sensor = await SensorModel.findOne({ userID: id })
 
@@ -64,6 +105,15 @@ const turnOnPump = async (key, mqtt, id) => {
     }
   )
 }
+
+/**
+ * Publish an OFF command to the user's Adafruit IO water pump feed.
+ *
+ * @param {string} key - Adafruit IO key.
+ * @param {string} mqtt - Adafruit IO username.
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<void>}
+ */
 const turnOffPump = async (key, mqtt, id) => {
   const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {
@@ -81,6 +131,14 @@ const turnOffPump = async (key, mqtt, id) => {
     }
   )
 }
+
+/**
+ * Read the latest water pump state from Adafruit IO.
+ *
+ * @param {string} mqtt - Adafruit IO username.
+ * @param {import('mongoose').Types.ObjectId} id - Authenticated user id.
+ * @returns {Promise<{value: string, created_at: string}>} Latest pump feed value.
+ */
 const getLastWaterPumpValue = async (mqtt, id) => {
   const sensor = await SensorModel.findOne({ userID: id })
   if (CommonUtils.checkNullOrUndefined(sensor)) {

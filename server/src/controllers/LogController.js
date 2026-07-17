@@ -1,5 +1,12 @@
 import { LogService } from '../services/LogService.js'
 
+/**
+ * Handle GET /logs and return logs for requested date.
+ *
+ * @param {import('express').Request} req - Request with date query and auth user.
+ * @param {import('express').Response} res - Express response.
+ * @returns {Promise<void>}
+ */
 const getDataOnDate = async (req, res) => {
   try {
     const { date } = req.query

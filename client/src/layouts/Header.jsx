@@ -5,6 +5,11 @@ import SettingsDialog from '../components/settingsDialog'
 import { useI18n } from '../i18n'
 import { classes } from '../styles/classes'
 
+/**
+ * Render top header with title, notification icon, and settings drawer trigger.
+ *
+ * @returns {JSX.Element} Header bar.
+ */
 export default function Header() {
 	const { t } = useI18n();
 	const [settingsOpen, setSettingsOpen] = useState(false);

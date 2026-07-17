@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -7,7 +6,14 @@ import Switch from '@mui/material/Switch';
 import { DUMMY_PUMP_STATE } from '../../data/dummyData';
 import { getTranslatedApiErrorMessage, isUnauthorized } from '../../utils/apiError';
 import { useI18n } from '../../i18n';
+import { getWaterPumpState, turnWaterPumpOff, turnWaterPumpOn } from '../../services/apiService';
 
+/**
+ * Render pump state switch and manual on/off control.
+ *
+ * @param {{api_token: string}} props - Auth token props.
+ * @returns {JSX.Element} Pump state control.
+ */
 export default function PumpState(props) {
     const [pumpState, setPumpState] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -15,14 +21,14 @@ export default function PumpState(props) {
     const navigate = useNavigate();
     const { t } = useI18n();
     useEffect(() => {
+        /**
+         * Fetch latest pump state.
+         *
+         * @returns {Promise<void>}
+         */
         const fetchApiData = async () => {
             try {
-                const config = {
-                    headers: {
-                        Authorization: "Bearer " + sessionID,
-                    }
-                };
-                const pumpResponse = await axios.get(`http://localhost:3001/waterpumps`, config);
+                const pumpResponse = await getWaterPumpState(sessionID);
                 setPumpState(pumpResponse.data.data.value !== "OFF")
                 setLoading(false);
             } catch (error) {
@@ -44,11 +50,19 @@ export default function PumpState(props) {
 
         return () => clearInterval(intervalId);
     }, [navigate, sessionID, t]);
+    /**
+     * Toggle pump state and send matching manual pump command.
+     *
+     * @returns {Promise<void>}
+     */
     const handleSwitchChange = async () => {
         try {
-            const apiEndpoint = pumpState ? "http://localhost:3001/waterpumps/manual/off" : "http://localhost:3001/waterpumps/manual/on";
             setPumpState(!pumpState); // Toggle pumpState after API call is successful
-            await axios.post(apiEndpoint, {}, { headers: { Authorization: "Bearer " + sessionID } });
+            if (pumpState) {
+                await turnWaterPumpOff(sessionID);
+            } else {
+                await turnWaterPumpOn(sessionID);
+            }
         } catch (error) {
             if (isUnauthorized(error)) {
                 alert(getTranslatedApiErrorMessage(t, error));
@@ -69,7 +83,7 @@ export default function PumpState(props) {
                         {t('pump.status')}
                     </div>
                     <div>
-                        
+
                         <FormGroup>
                             <FormControlLabel
                                 control={<Switch checked={pumpState} onChange={handleSwitchChange}  />}

@@ -1,22 +1,40 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { DUMMY_LOGS } from "../../data/dummyData";
 import { getTranslatedApiErrorMessage, isUnauthorized } from "../../utils/apiError";
 import { useI18n } from "../../i18n";
 import { classes } from "../../styles/classes";
+import { getLogsByDate } from "../../services/apiService";
 
+/**
+ * Format log timestamp for display.
+ *
+ * @param {string} dateString - API date text.
+ * @returns {string} Local date-time text.
+ */
 function formatTime(dateString) {
   const date = new Date(dateString);
   return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
 }
 
+/**
+ * Render today's log preview card.
+ *
+ * @param {{api_token: string}} props - Auth token props.
+ * @returns {JSX.Element} Log preview.
+ */
 export default function History(props) {
   const sessionID = props.api_token;
   const [logData, setlogData] = useState([]);
   const navigate = useNavigate();
   const { t } = useI18n();
 
+  /**
+   * Convert API logs to display rows.
+   *
+   * @param {Array<object>} logs - API log list.
+   * @returns {Array<{activity: string, time: string}>} Display rows.
+   */
   const toLogRows = (logs) =>
     logs.map((log) => ({
       activity: log.activity,
@@ -24,18 +42,15 @@ export default function History(props) {
     }));
 
   useEffect(() => {
+    /**
+     * Fetch today's logs.
+     *
+     * @returns {Promise<void>}
+     */
     const fetchData = async () => {
       try {
         const today = new Date();
-        const config = {
-          headers: {
-            Authorization: "Bearer " + sessionID,
-          },
-          params: {
-            date: today,
-          },
-        };
-        const response = await axios.get("http://localhost:3001/logs", config);
+        const response = await getLogsByDate(sessionID, today);
         setlogData(toLogRows(response.data));
       } catch (error) {
         if (isUnauthorized(error)) {

@@ -2,6 +2,13 @@ import { BadRequestError } from '../errors/badRequest.error.js'
 import { UserModel } from '../models/Users.js'
 import { Types } from 'mongoose'
 
+/**
+ * Find a user by username and password after rejecting non-string input.
+ *
+ * @param {string} inputUserName - Username from login request.
+ * @param {string} inputPassword - Password from login request.
+ * @returns {Promise<object|null>} Matching user document or null.
+ */
 const login = async (inputUserName, inputPassword) => {
   // Reject non-string input (one guard per value, so each is individually
   // narrowed to a string) before it reaches the query — a crafted object like
@@ -20,6 +27,16 @@ const login = async (inputUserName, inputPassword) => {
     .equals(inputPassword)
     .exec()
 }
+
+/**
+ * Create a user account when username is unused.
+ *
+ * @param {string} username - Account username.
+ * @param {string} password - Account password.
+ * @param {string} mqttUsername - Adafruit IO username.
+ * @param {string} aioKey - Adafruit IO key.
+ * @returns {Promise<object>} Saved user document.
+ */
 const register = async (username, password, mqttUsername, aioKey) => {
   if (typeof username !== 'string') {
     throw new BadRequestError('Username must be a string')
@@ -50,6 +67,13 @@ const register = async (username, password, mqttUsername, aioKey) => {
   })
   return await user.save()
 }
+
+/**
+ * Load a user document from an API token subject id.
+ *
+ * @param {string} id - User id encoded in JWT token.
+ * @returns {Promise<object|null>} User document or null.
+ */
 const authorize = async (id) => {
   id = Types.ObjectId.createFromHexString(id)
   return await UserModel.findById(id).exec()

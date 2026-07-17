@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { useNavigate } from 'react-router-dom';
@@ -7,13 +6,25 @@ import { DUMMY_LOGS } from '../../data/dummyData';
 import { getTranslatedApiErrorMessage, isUnauthorized } from '../../utils/apiError';
 import { useI18n } from '../../i18n';
 import { classes } from '../../styles/classes';
+import { getLogsByDate } from '../../services/apiService';
 
+/**
+ * Format log timestamp for display.
+ *
+ * @param {string} dateString - API date text.
+ * @returns {string} Local date-time text.
+ */
 function formatTime(dateString) {
     const date = new Date(dateString);
     // Định dạng theo dạng 'ngày/tháng/năm giờ:phút:giây'
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
 }
 
+/**
+ * Render calendar-driven log history.
+ *
+ * @returns {JSX.Element} Selected-date log history.
+ */
 export default function SeHistory() {
     const sessionID = localStorage.getItem('sessionID');
     const [logData, setlogData] = useState([]);
@@ -22,12 +33,23 @@ export default function SeHistory() {
     const navigate = useNavigate();
     const { t } = useI18n();
 
+    /**
+     * Convert API logs to display rows.
+     *
+     * @param {Array<object>} logs - API log list.
+     * @returns {Array<{activity: string, time: string}>} Display rows.
+     */
     const toLogRows = (logs) => logs.map(log => ({
         activity: log.activity,
         time: formatTime(log.Date),
     }));
 
     useEffect(() => {
+        /**
+         * Fetch logs for selected calendar date.
+         *
+         * @returns {Promise<void>}
+         */
         const fetchData = async () => {
             try {
 				if (!localStorage.getItem('sessionID')){
@@ -41,15 +63,7 @@ export default function SeHistory() {
                     else {
                         hasLoadedInitialDate.current = true;
                     }
-                    const config = {
-                        headers: {
-                          Authorization: "Bearer " + sessionID
-                        },
-                        params: {
-                          date: newDate.toISOString()
-                        }
-                      };
-                    const response = await axios.get('http://localhost:3001/logs', config);
+                    const response = await getLogsByDate(sessionID, newDate.toISOString());
                     setlogData(toLogRows(response.data));
                 }
             } catch (error) {

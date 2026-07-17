@@ -2,11 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useI18n } from '../../i18n';
 
+/**
+ * Render user account page after auth marker check.
+ *
+ * @returns {JSX.Element} User page.
+ */
 export default function User() {
 	const [loading, setLoading] = useState(true);
 	const navigate = useNavigate();
 	const { t } = useI18n();
 	useEffect(() => {
+        /**
+         * Verify local auth marker before showing user page.
+         *
+         * @returns {Promise<void>}
+         */
         const fetchApiData = async () => {
 			try {
 				if (!localStorage.getItem('sessionID')){

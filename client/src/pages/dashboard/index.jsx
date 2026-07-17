@@ -4,11 +4,21 @@ import LastValues from '../../components/lastValues';
 import PumpInfo from '../../components/pumpInfo'
 import History from '../../components/history'
 
+/**
+ * Render dashboard page after auth marker check.
+ *
+ * @returns {JSX.Element} Dashboard page.
+ */
 export default function Dashboard() {
 	const sessionID = localStorage.getItem('sessionID');
 	const [loading, setLoading] = useState(true);
 	const navigate = useNavigate();
 	useEffect(() => {
+        /**
+         * Verify local auth marker before showing dashboard.
+         *
+         * @returns {Promise<void>}
+         */
         const fetchApiData = async () => {
 			try {
 				if (!localStorage.getItem('sessionID')){

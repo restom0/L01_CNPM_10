@@ -3,6 +3,11 @@ import { useTheme } from "../../theme";
 import { useI18n } from "../../i18n";
 import { classes } from "../../styles/classes";
 
+/**
+ * Render theme toggle button.
+ *
+ * @returns {JSX.Element} Theme switcher.
+ */
 export default function ThemeSwitcher() {
   const { theme, toggleTheme } = useTheme();
   const { t } = useI18n();
