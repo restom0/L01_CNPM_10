@@ -27,11 +27,13 @@ export const sensorSeed = {
   waterPumpFeedName: 'pump-feed'
 }
 
+const createTestCredential = () => `test-${new Types.ObjectId().toHexString()}`
+
 export async function createUser (overrides = {}) {
   return await UserModel.create({
     _id: overrides._id ?? new Types.ObjectId(),
     username: overrides.username ?? 'test-user',
-    password: overrides.password ?? 'test-password',
+    password: overrides.password ?? createTestCredential(),
     mqttusername: overrides.mqttusername ?? 'mqtt-user',
     AIO_Key: overrides.AIO_Key ?? 'aio-key'
   })

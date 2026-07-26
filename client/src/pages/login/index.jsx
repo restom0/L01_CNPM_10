@@ -17,7 +17,7 @@ export default function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const { t } = useI18n();
-    const demoPassword = import.meta.env.VITE_DEMO_ADMIN_PASSWORD;
+    const demoPassword = import.meta.env.VITE_DEMO_ADMIN_PASSWORD || DUMMY_ADMIN.password;
     const expiresDate = new Date();
     expiresDate.setDate(expiresDate.getDate() + 3);
     /**

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import axios from 'axios'
+import { DUMMY_ADMIN } from '../data/dummyData.js'
 import * as api from './apiService.js'
 
 vi.mock('axios', () => ({
@@ -106,5 +107,46 @@ describe('apiService water pump API (UT)', () => {
     expect(axios.post).toHaveBeenCalledWith(`${base}/waterpumps/auto`, { startTime: '06:00', endTime: '06:10' }, auth)
     expect(axios.put).toHaveBeenCalledWith(`${base}/waterpumps/auto/timer-id`, { startTime: '07:00', endTime: '07:10' }, auth)
     expect(axios.delete).toHaveBeenCalledWith(`${base}/waterpumps/auto/timer-id`, auth)
+  })
+})
+
+describe('apiService demo mode (UT)', () => {
+  const demoToken = DUMMY_ADMIN.token
+
+  it('returns demo data without calling the backend', async () => {
+    await expect(api.getLatestTemperature(demoToken)).resolves.toMatchObject({
+      data: {
+        data: { value: expect.any(Number), created_at: expect.any(String) },
+        lower: expect.any(Number),
+        upper: expect.any(Number),
+        needNoti: expect.any(Boolean)
+      }
+    })
+    await expect(api.getTemperatureChart(demoToken)).resolves.toMatchObject({
+      data: { data: expect.any(Array) }
+    })
+    await expect(api.getLogsByDate(demoToken, '2026-01-02')).resolves.toMatchObject({
+      data: expect.any(Array)
+    })
+    await expect(api.getWaterPumpState(demoToken)).resolves.toMatchObject({
+      data: { data: { value: expect.any(String), created_at: expect.any(String) } }
+    })
+    await expect(api.listWaterPumpTimers(demoToken)).resolves.toMatchObject({
+      data: { data: expect.any(Array) }
+    })
+    await expect(api.turnWaterPumpOn(demoToken)).resolves.toEqual({
+      data: { data: 'Pump is turned on' }
+    })
+    await expect(api.createWaterPumpTimer(demoToken, '08:00', '08:10')).resolves.toEqual({
+      data: { data: 'Timer is created' }
+    })
+    await expect(api.updateLightThreshold(demoToken, 9000, 1000)).resolves.toEqual({
+      data: { message: 'Threshold updated' }
+    })
+
+    expect(axios.get).not.toHaveBeenCalled()
+    expect(axios.post).not.toHaveBeenCalled()
+    expect(axios.put).not.toHaveBeenCalled()
+    expect(axios.delete).not.toHaveBeenCalled()
   })
 })

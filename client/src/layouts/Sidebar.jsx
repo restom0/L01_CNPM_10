@@ -1,10 +1,11 @@
 import React from 'react'
 import classNames from 'classnames'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { HiHome, HiChartBar, HiLogout} from 'react-icons/hi'
+import { HiHome, HiChartBar, HiLogout, HiPlay } from 'react-icons/hi'
 import { IoBuild } from 'react-icons/io5'
 import { HiDocument } from 'react-icons/hi2'
 import { useI18n } from '../i18n';
+import { DUMMY_ADMIN } from '../data/dummyData';
 import { getTranslatedApiErrorMessage } from '../utils/apiError';
 import { logoutUser } from '../services/apiService';
 
@@ -91,6 +92,10 @@ export default function Sidebar() {
             alert(getTranslatedApiErrorMessage(t, error));
         }
     };
+	const handleDemoMode = () => {
+		localStorage.setItem('sessionID', DUMMY_ADMIN.token);
+		navigate('/dashboard');
+	};
 	return (
 		<div className="bg-white w-[260px] pt-[var(--spacing-section)] px-[var(--spacing-x)] flex flex-col">
 			<div className="flex flex-1 flex-col gap-y-[var(--spacing-y)]">
@@ -100,6 +105,12 @@ export default function Sidebar() {
 			</div>
 			
 			<div className="flex flex-col gap-y-[var(--spacing-y)] pt-[var(--spacing-y)] rounded-md">
+				<button type='button' className={classNames(linkClass, 'cursor-pointer text-mainBlue hover:bg-lightGray')} onClick={handleDemoMode}>
+					<span className="text-xl">
+						<HiPlay />
+					</span>
+					{t('nav.demo')}
+				</button>
 				<button type='button' className={classNames(linkClass, 'cursor-pointer text-mainRed mb-[var(--spacing-y)] hover:bg-lightRed ')} onClick={handleLogout}>
 					<span className="text-xl">
 						<HiLogout />

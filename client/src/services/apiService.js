@@ -1,6 +1,37 @@
 import axios from "axios";
+import {
+  DUMMY_ADMIN,
+  DUMMY_CHART_SERIES,
+  DUMMY_LOGS,
+  DUMMY_PUMP_AUTOS,
+  DUMMY_PUMP_RESPONSE,
+  DUMMY_SENSOR_RESPONSES,
+} from "../data/dummyData";
 
 const API_BASE_URL = "http://localhost:3001";
+const DEMO_MESSAGES = {
+  thresholdUpdated: { message: "Threshold updated" },
+  pumpOn: { data: "Pump is turned on" },
+  pumpOff: { data: "Pump is turned off" },
+  timerCreated: { data: "Timer is created" },
+  timerUpdated: { data: "Timer is updated" },
+  timerDeleted: { data: "Timer is deleted" },
+};
+
+function isDemoSession(sessionID) {
+  return sessionID === DUMMY_ADMIN.token;
+}
+
+function demoResponse(data) {
+  return Promise.resolve({ data });
+}
+
+function withDemo(sessionID, data, request) {
+  if (isDemoSession(sessionID)) {
+    return demoResponse(data);
+  }
+  return request();
+}
 
 /**
  * Build bearer auth config for protected API requests.
@@ -110,7 +141,9 @@ export function logoutUser() {
  * @returns {Promise<import("axios").AxiosResponse>} Temperature response.
  */
 export function getLatestTemperature(sessionID) {
-  return axios.get(`${API_BASE_URL}/sensors/temp`, authConfig(sessionID));
+  return withDemo(sessionID, DUMMY_SENSOR_RESPONSES.temp, () =>
+    axios.get(`${API_BASE_URL}/sensors/temp`, authConfig(sessionID))
+  );
 }
 
 /**
@@ -127,7 +160,9 @@ export function getLatestTemperature(sessionID) {
  * @returns {Promise<import("axios").AxiosResponse>} Light response.
  */
 export function getLatestLight(sessionID) {
-  return axios.get(`${API_BASE_URL}/sensors/light`, authConfig(sessionID));
+  return withDemo(sessionID, DUMMY_SENSOR_RESPONSES.light, () =>
+    axios.get(`${API_BASE_URL}/sensors/light`, authConfig(sessionID))
+  );
 }
 
 /**
@@ -144,7 +179,9 @@ export function getLatestLight(sessionID) {
  * @returns {Promise<import("axios").AxiosResponse>} Humidity response.
  */
 export function getLatestHumidity(sessionID) {
-  return axios.get(`${API_BASE_URL}/sensors/humid`, authConfig(sessionID));
+  return withDemo(sessionID, DUMMY_SENSOR_RESPONSES.humid, () =>
+    axios.get(`${API_BASE_URL}/sensors/humid`, authConfig(sessionID))
+  );
 }
 
 /**
@@ -161,7 +198,9 @@ export function getLatestHumidity(sessionID) {
  * @returns {Promise<import("axios").AxiosResponse>} Moisture response.
  */
 export function getLatestMoisture(sessionID) {
-  return axios.get(`${API_BASE_URL}/sensors/moisture`, authConfig(sessionID));
+  return withDemo(sessionID, DUMMY_SENSOR_RESPONSES.moisture, () =>
+    axios.get(`${API_BASE_URL}/sensors/moisture`, authConfig(sessionID))
+  );
 }
 
 /**
@@ -178,7 +217,11 @@ export function getLatestMoisture(sessionID) {
  * @returns {Promise<import("axios").AxiosResponse>} Environmental dryness response.
  */
 export function calculateEnvironmentDryness(sessionID) {
-  return axios.get(`${API_BASE_URL}/sensors/ed`, authConfig(sessionID));
+  return withDemo(
+    sessionID,
+    { data: DUMMY_CHART_SERIES.ed[DUMMY_CHART_SERIES.ed.length - 1] },
+    () => axios.get(`${API_BASE_URL}/sensors/ed`, authConfig(sessionID))
+  );
 }
 
 /**
@@ -195,7 +238,9 @@ export function calculateEnvironmentDryness(sessionID) {
  * @returns {Promise<import("axios").AxiosResponse>} Temperature chart response.
  */
 export function getTemperatureChart(sessionID) {
-  return axios.get(`${API_BASE_URL}/sensors/chart/temp`, authConfig(sessionID));
+  return withDemo(sessionID, { data: DUMMY_CHART_SERIES.temp }, () =>
+    axios.get(`${API_BASE_URL}/sensors/chart/temp`, authConfig(sessionID))
+  );
 }
 
 /**
@@ -212,7 +257,9 @@ export function getTemperatureChart(sessionID) {
  * @returns {Promise<import("axios").AxiosResponse>} Light chart response.
  */
 export function getLightChart(sessionID) {
-  return axios.get(`${API_BASE_URL}/sensors/chart/light`, authConfig(sessionID));
+  return withDemo(sessionID, { data: DUMMY_CHART_SERIES.light }, () =>
+    axios.get(`${API_BASE_URL}/sensors/chart/light`, authConfig(sessionID))
+  );
 }
 
 /**
@@ -229,7 +276,9 @@ export function getLightChart(sessionID) {
  * @returns {Promise<import("axios").AxiosResponse>} Humidity chart response.
  */
 export function getHumidityChart(sessionID) {
-  return axios.get(`${API_BASE_URL}/sensors/chart/humid`, authConfig(sessionID));
+  return withDemo(sessionID, { data: DUMMY_CHART_SERIES.humid }, () =>
+    axios.get(`${API_BASE_URL}/sensors/chart/humid`, authConfig(sessionID))
+  );
 }
 
 /**
@@ -246,7 +295,9 @@ export function getHumidityChart(sessionID) {
  * @returns {Promise<import("axios").AxiosResponse>} Moisture chart response.
  */
 export function getMoistureChart(sessionID) {
-  return axios.get(`${API_BASE_URL}/sensors/chart/moisture`, authConfig(sessionID));
+  return withDemo(sessionID, { data: DUMMY_CHART_SERIES.moisture }, () =>
+    axios.get(`${API_BASE_URL}/sensors/chart/moisture`, authConfig(sessionID))
+  );
 }
 
 /**
@@ -263,7 +314,9 @@ export function getMoistureChart(sessionID) {
  * @returns {Promise<import("axios").AxiosResponse>} Environmental dryness chart response.
  */
 export function getEnvironmentDrynessChart(sessionID) {
-  return axios.get(`${API_BASE_URL}/sensors/chart/ed`, authConfig(sessionID));
+  return withDemo(sessionID, { data: DUMMY_CHART_SERIES.ed }, () =>
+    axios.get(`${API_BASE_URL}/sensors/chart/ed`, authConfig(sessionID))
+  );
 }
 
 /**
@@ -282,9 +335,11 @@ export function getEnvironmentDrynessChart(sessionID) {
  * @returns {Promise<import("axios").AxiosResponse>} Update response.
  */
 export function updateTemperatureThreshold(sessionID, upper, lower) {
-  return axios.put(`${API_BASE_URL}/sensors/threshold/temp`, {}, authConfig(sessionID, {
-    params: thresholdParams(upper, lower),
-  }));
+  return withDemo(sessionID, DEMO_MESSAGES.thresholdUpdated, () =>
+    axios.put(`${API_BASE_URL}/sensors/threshold/temp`, {}, authConfig(sessionID, {
+      params: thresholdParams(upper, lower),
+    }))
+  );
 }
 
 /**
@@ -303,9 +358,11 @@ export function updateTemperatureThreshold(sessionID, upper, lower) {
  * @returns {Promise<import("axios").AxiosResponse>} Update response.
  */
 export function updateLightThreshold(sessionID, upper, lower) {
-  return axios.put(`${API_BASE_URL}/sensors/threshold/light`, {}, authConfig(sessionID, {
-    params: thresholdParams(upper, lower),
-  }));
+  return withDemo(sessionID, DEMO_MESSAGES.thresholdUpdated, () =>
+    axios.put(`${API_BASE_URL}/sensors/threshold/light`, {}, authConfig(sessionID, {
+      params: thresholdParams(upper, lower),
+    }))
+  );
 }
 
 /**
@@ -324,9 +381,11 @@ export function updateLightThreshold(sessionID, upper, lower) {
  * @returns {Promise<import("axios").AxiosResponse>} Update response.
  */
 export function updateHumidityThreshold(sessionID, upper, lower) {
-  return axios.put(`${API_BASE_URL}/sensors/threshold/humid`, {}, authConfig(sessionID, {
-    params: thresholdParams(upper, lower),
-  }));
+  return withDemo(sessionID, DEMO_MESSAGES.thresholdUpdated, () =>
+    axios.put(`${API_BASE_URL}/sensors/threshold/humid`, {}, authConfig(sessionID, {
+      params: thresholdParams(upper, lower),
+    }))
+  );
 }
 
 /**
@@ -345,9 +404,11 @@ export function updateHumidityThreshold(sessionID, upper, lower) {
  * @returns {Promise<import("axios").AxiosResponse>} Update response.
  */
 export function updateMoistureThreshold(sessionID, upper, lower) {
-  return axios.put(`${API_BASE_URL}/sensors/threshold/moisture`, {}, authConfig(sessionID, {
-    params: thresholdParams(upper, lower),
-  }));
+  return withDemo(sessionID, DEMO_MESSAGES.thresholdUpdated, () =>
+    axios.put(`${API_BASE_URL}/sensors/threshold/moisture`, {}, authConfig(sessionID, {
+      params: thresholdParams(upper, lower),
+    }))
+  );
 }
 
 /**
@@ -365,9 +426,11 @@ export function updateMoistureThreshold(sessionID, upper, lower) {
  * @returns {Promise<import("axios").AxiosResponse>} Logs response.
  */
 export function getLogsByDate(sessionID, date) {
-  return axios.get(`${API_BASE_URL}/logs`, authConfig(sessionID, {
-    params: { date },
-  }));
+  return withDemo(sessionID, DUMMY_LOGS, () =>
+    axios.get(`${API_BASE_URL}/logs`, authConfig(sessionID, {
+      params: { date },
+    }))
+  );
 }
 
 /**
@@ -384,7 +447,9 @@ export function getLogsByDate(sessionID, date) {
  * @returns {Promise<import("axios").AxiosResponse>} Pump state response.
  */
 export function getWaterPumpState(sessionID) {
-  return axios.get(`${API_BASE_URL}/waterpumps`, authConfig(sessionID));
+  return withDemo(sessionID, { data: DUMMY_PUMP_RESPONSE }, () =>
+    axios.get(`${API_BASE_URL}/waterpumps`, authConfig(sessionID))
+  );
 }
 
 /**
@@ -401,7 +466,9 @@ export function getWaterPumpState(sessionID) {
  * @returns {Promise<import("axios").AxiosResponse>} Pump command response.
  */
 export function turnWaterPumpOn(sessionID) {
-  return axios.post(`${API_BASE_URL}/waterpumps/manual/on`, {}, authConfig(sessionID));
+  return withDemo(sessionID, DEMO_MESSAGES.pumpOn, () =>
+    axios.post(`${API_BASE_URL}/waterpumps/manual/on`, {}, authConfig(sessionID))
+  );
 }
 
 /**
@@ -418,7 +485,9 @@ export function turnWaterPumpOn(sessionID) {
  * @returns {Promise<import("axios").AxiosResponse>} Pump command response.
  */
 export function turnWaterPumpOff(sessionID) {
-  return axios.post(`${API_BASE_URL}/waterpumps/manual/off`, {}, authConfig(sessionID));
+  return withDemo(sessionID, DEMO_MESSAGES.pumpOff, () =>
+    axios.post(`${API_BASE_URL}/waterpumps/manual/off`, {}, authConfig(sessionID))
+  );
 }
 
 /**
@@ -435,7 +504,9 @@ export function turnWaterPumpOff(sessionID) {
  * @returns {Promise<import("axios").AxiosResponse>} Timer list response.
  */
 export function listWaterPumpTimers(sessionID) {
-  return axios.get(`${API_BASE_URL}/waterpumps/auto`, authConfig(sessionID));
+  return withDemo(sessionID, { data: DUMMY_PUMP_AUTOS }, () =>
+    axios.get(`${API_BASE_URL}/waterpumps/auto`, authConfig(sessionID))
+  );
 }
 
 /**
@@ -454,7 +525,9 @@ export function listWaterPumpTimers(sessionID) {
  * @returns {Promise<import("axios").AxiosResponse>} Create response.
  */
 export function createWaterPumpTimer(sessionID, startTime, endTime) {
-  return axios.post(`${API_BASE_URL}/waterpumps/auto`, { startTime, endTime }, authConfig(sessionID));
+  return withDemo(sessionID, DEMO_MESSAGES.timerCreated, () =>
+    axios.post(`${API_BASE_URL}/waterpumps/auto`, { startTime, endTime }, authConfig(sessionID))
+  );
 }
 
 /**
@@ -474,7 +547,9 @@ export function createWaterPumpTimer(sessionID, startTime, endTime) {
  * @returns {Promise<import("axios").AxiosResponse>} Update response.
  */
 export function updateWaterPumpTimer(sessionID, id, startTime, endTime) {
-  return axios.put(`${API_BASE_URL}/waterpumps/auto/${id}`, { startTime, endTime }, authConfig(sessionID));
+  return withDemo(sessionID, DEMO_MESSAGES.timerUpdated, () =>
+    axios.put(`${API_BASE_URL}/waterpumps/auto/${id}`, { startTime, endTime }, authConfig(sessionID))
+  );
 }
 
 /**
@@ -492,5 +567,7 @@ export function updateWaterPumpTimer(sessionID, id, startTime, endTime) {
  * @returns {Promise<import("axios").AxiosResponse>} Delete response.
  */
 export function deleteWaterPumpTimer(sessionID, id) {
-  return axios.delete(`${API_BASE_URL}/waterpumps/auto/${id}`, authConfig(sessionID));
+  return withDemo(sessionID, DEMO_MESSAGES.timerDeleted, () =>
+    axios.delete(`${API_BASE_URL}/waterpumps/auto/${id}`, authConfig(sessionID))
+  );
 }
