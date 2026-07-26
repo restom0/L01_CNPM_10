@@ -73,7 +73,7 @@ export default function Login() {
                     <input type="password" className={classes.authField} value={password} onChange={(e) => setPassword(e.target.value)}/>
                 </div>
                 <div className="mt-[var(--spacing-section)] w-2/3">
-                    <button className={classes.authSubmitButton} onClick={handleLogin}>{t('auth.login')}</button>
+                    <button type="button" className={classes.authSubmitButton} onClick={handleLogin}>{t('auth.login')}</button>
                 </div>
                 <div className="mt-[var(--spacing-x)] w-2/3 text-center">
                     <p className="inline-block">{t('auth.noAccount')}&nbsp;</p>

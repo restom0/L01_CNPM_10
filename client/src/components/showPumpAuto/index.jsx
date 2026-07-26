@@ -159,7 +159,7 @@ export default function ShowPumpAuto(props) {
                                         <MdCancel onClick={handleIconClick} className='inline mr-1' cursor={'pointer'} color='black' size={20}/>
                                     )}
                                     {t('common.from')} {pumpAuto.startTime} {t('common.to')} {pumpAuto.endTime}
-                                    <button className="bg-mainRed text-center rounded-full min-h-[44px] w-[64px] text-white float-right" onClick={() => deletePumpAuto(pumpAuto.id)}>{t('common.cancel')}</button>
+                                    <button type="button" className="bg-mainRed text-center rounded-full min-h-[44px] w-[64px] text-white float-right" onClick={() => deletePumpAuto(pumpAuto.id)}>{t('common.cancel')}</button>
                                 </div>
                                 {showModal && (
                                     <div className="modal">
@@ -173,7 +173,7 @@ export default function ShowPumpAuto(props) {
                                                 <input className='rounded-full' type="time" value={endTime} onChange={handleEndTimeChange} />
                                             </div>
                                             <div className='float-right'>
-                                                <button className={classes.scheduleButton} onClick={() => handleSubmit(pumpAuto.id)}>{t('common.ok')}</button>
+                                                <button type="button" className={classes.scheduleButton} onClick={() => handleSubmit(pumpAuto.id)}>{t('common.ok')}</button>
                                             </div>
                                             <div className='clear-both'></div>
                                         </div>

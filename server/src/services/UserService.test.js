@@ -18,6 +18,17 @@ const sample = {
 }
 
 describe('UserService.register (IT)', () => {
+  it.each([
+    [123, sample.password, sample.mqttUsername, sample.aioKey, 'Username must be a string'],
+    [sample.username, 123, sample.mqttUsername, sample.aioKey, 'Password must be a string'],
+    [sample.username, sample.password, 123, sample.aioKey, 'Mqtt username must be a string'],
+    [sample.username, sample.password, sample.mqttUsername, 123, 'Key must be a string']
+  ])('rejects non-string register input', async (username, password, mqttUsername, aioKey, message) => {
+    await expect(
+      UserService.register(username, password, mqttUsername, aioKey)
+    ).rejects.toThrow(message)
+  })
+
   it('persists a new user and returns it', async () => {
     const saved = await UserService.register(
       sample.username,

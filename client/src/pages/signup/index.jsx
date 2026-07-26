@@ -92,7 +92,7 @@ export default function Signup() {
                     <input type="password" className={classes.authField} required value={aioKey} onChange={(e) => setAioKey(e.target.value)}/>
                 </div>
                 <div className="mt-[var(--spacing-section)] w-2/3">
-                    <button className={classes.authSubmitButton} onClick={handleRegister}>{t('auth.signup')}</button>
+                    <button type="button" className={classes.authSubmitButton} onClick={handleRegister}>{t('auth.signup')}</button>
                 </div>
                 <div className="mt-[var(--spacing-x)] w-full text-center">
                     <p className="inline-block">{t('auth.haveAccount')}&nbsp;</p>

@@ -211,10 +211,10 @@ const updateLightThreshold = async (id, upper, lower) => {
     { userID: id },
     { upperLightThreshold: upper, lowerLightThreshold: lower }
   )
-  await updateEnvironmentDrynessThreshold(id)
   if (CommonUtils.checkNullOrUndefined(sensor)) {
     throw new NotFoundError('Light sensor not found')
   }
+  await updateEnvironmentDrynessThreshold(id)
 }
 
 /**
@@ -244,10 +244,10 @@ const updateTemperatureThreshold = async (id, upper, lower) => {
     { userID: id },
     { upperTemperatureThreshold: upper, lowerTemperatureThreshold: lower }
   )
-  await updateEnvironmentDrynessThreshold(id)
   if (CommonUtils.checkNullOrUndefined(sensor)) {
-    throw new NotFoundError('Light sensor not found')
+    throw new NotFoundError('Temperature sensor not found')
   }
+  await updateEnvironmentDrynessThreshold(id)
 }
 
 /**
@@ -277,10 +277,10 @@ const updateHumidityThreshold = async (id, upper, lower) => {
     { userID: id },
     { upperHumidityThreshold: upper, lowerHumidityThreshold: lower }
   )
-  await updateEnvironmentDrynessThreshold(id)
   if (CommonUtils.checkNullOrUndefined(sensor)) {
-    throw new NotFoundError('Light sensor not found')
+    throw new NotFoundError('Humidity sensor not found')
   }
+  await updateEnvironmentDrynessThreshold(id)
 }
 
 /**
@@ -310,10 +310,10 @@ const updateMoistureThreshold = async (id, upper, lower) => {
     { userID: id },
     { upperMoistureThreshold: upper, lowerMoistureThreshold: lower }
   )
-  await updateEnvironmentDrynessThreshold(id)
   if (CommonUtils.checkNullOrUndefined(sensor)) {
-    throw new NotFoundError('Light sensor not found')
+    throw new NotFoundError('Moisture sensor not found')
   }
+  await updateEnvironmentDrynessThreshold(id)
 }
 
 /**

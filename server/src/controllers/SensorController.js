@@ -3,6 +3,42 @@ import { NotFoundError } from '../errors/notFound.error.js'
 import { SensorService } from '../services/SensorService.js'
 import { CommonUtils } from '../utils/common.js'
 
+const parseThresholdQuery = (query) => {
+  let { upper, lower } = query
+  if (CommonUtils.checkNullOrUndefined(upper)) {
+    throw new BadRequestError('Upper threshold is empty')
+  }
+  if (CommonUtils.checkNullOrUndefined(lower)) {
+    throw new BadRequestError('Lower threshold is empty')
+  }
+  upper = Number(upper)
+  lower = Number(lower)
+  if (upper < lower) {
+    throw new BadRequestError('Invalid Threshold')
+  }
+  return { upper, lower }
+}
+
+const loadThreshold = async (req, res, next, serviceMethod) => {
+  try {
+    const result = await SensorService[serviceMethod](req.user.id)
+    res.threshold = { upper: result.upper, lower: result.lower }
+    next()
+  } catch (error) {
+    res.status(error.statusCode).json({ error: error.message })
+  }
+}
+
+const updateThreshold = async (req, res, serviceMethod) => {
+  try {
+    const { upper, lower } = parseThresholdQuery(req.query)
+    await SensorService[serviceMethod](req.user.id, upper, lower)
+    res.status(200).json({ message: 'Threshold updated' })
+  } catch (error) {
+    res.status(error.statusCode).json({ error: error.message })
+  }
+}
+
 /**
  * Handle GET /sensors/chart/humid and return humidity history.
  *
@@ -197,13 +233,7 @@ const getLastEnvironmentValue = async (req, res) => {
  * @returns {Promise<void>}
  */
 const getLightThreshold = async (req, res, next) => {
-  try {
-    const result = await SensorService.getLightThreshold(req.user.id)
-    res.threshold = { upper: result.upper, lower: result.lower }
-    next()
-  } catch (error) {
-    res.status(error.statusCode).json({ error: error.message })
-  }
+  await loadThreshold(req, res, next, 'getLightThreshold')
 }
 
 /**
@@ -214,24 +244,7 @@ const getLightThreshold = async (req, res, next) => {
  * @returns {Promise<void>}
  */
 const updateLightThreshold = async (req, res) => {
-  try {
-    let { upper, lower } = req.query
-    if (CommonUtils.checkNullOrUndefined(upper)) {
-      throw new BadRequestError('Upper threshold is empty')
-    }
-    if (CommonUtils.checkNullOrUndefined(lower)) {
-      throw new BadRequestError('Lower threshold is empty')
-    }
-    upper = Number(upper)
-    lower = Number(lower)
-    if (upper < lower) {
-      throw new BadRequestError('Invalid Threshold')
-    }
-    await SensorService.updateLightThreshold(req.user.id, upper, lower)
-    res.status(200).json({ message: 'Threshold updated' })
-  } catch (error) {
-    res.status(error.statusCode).json({ error: error.message })
-  }
+  await updateThreshold(req, res, 'updateLightThreshold')
 }
 
 /**
@@ -243,13 +256,7 @@ const updateLightThreshold = async (req, res) => {
  * @returns {Promise<void>}
  */
 const getTemperatureThreshold = async (req, res, next) => {
-  try {
-    const result = await SensorService.getTemperatureThreshold(req.user.id)
-    res.threshold = { upper: result.upper, lower: result.lower }
-    next()
-  } catch (error) {
-    res.status(error.statusCode).json({ error: error.message })
-  }
+  await loadThreshold(req, res, next, 'getTemperatureThreshold')
 }
 
 /**
@@ -260,24 +267,7 @@ const getTemperatureThreshold = async (req, res, next) => {
  * @returns {Promise<void>}
  */
 const updateTemperatureThreshold = async (req, res) => {
-  try {
-    let { upper, lower } = req.query
-    if (CommonUtils.checkNullOrUndefined(upper)) {
-      throw new BadRequestError('Upper threshold is empty')
-    }
-    if (CommonUtils.checkNullOrUndefined(lower)) {
-      throw new BadRequestError('Lower threshold is empty')
-    }
-    upper = Number(upper)
-    lower = Number(lower)
-    if (upper < lower) {
-      throw new BadRequestError('Invalid Threshold')
-    }
-    await SensorService.updateTemperatureThreshold(req.user.id, upper, lower)
-    res.status(200).json({ message: 'Threshold updated' })
-  } catch (error) {
-    res.status(error.statusCode).json({ error: error.message })
-  }
+  await updateThreshold(req, res, 'updateTemperatureThreshold')
 }
 
 /**
@@ -289,13 +279,7 @@ const updateTemperatureThreshold = async (req, res) => {
  * @returns {Promise<void>}
  */
 const getHumidityThreshold = async (req, res, next) => {
-  try {
-    const result = await SensorService.getHumidityThreshold(req.user.id)
-    res.threshold = { upper: result.upper, lower: result.lower }
-    next()
-  } catch (error) {
-    res.status(error.statusCode).json({ error: error.message })
-  }
+  await loadThreshold(req, res, next, 'getHumidityThreshold')
 }
 
 /**
@@ -306,24 +290,7 @@ const getHumidityThreshold = async (req, res, next) => {
  * @returns {Promise<void>}
  */
 const updateHumidityThreshold = async (req, res) => {
-  try {
-    let { upper, lower } = req.query
-    if (CommonUtils.checkNullOrUndefined(upper)) {
-      throw new BadRequestError('Upper threshold is empty')
-    }
-    if (CommonUtils.checkNullOrUndefined(lower)) {
-      throw new BadRequestError('Lower threshold is empty')
-    }
-    upper = Number(upper)
-    lower = Number(lower)
-    if (upper < lower) {
-      throw new BadRequestError('Invalid Threshold')
-    }
-    await SensorService.updateHumidityThreshold(req.user.id, upper, lower)
-    res.status(200).json({ message: 'Threshold updated' })
-  } catch (error) {
-    res.status(error.statusCode).json({ error: error.message })
-  }
+  await updateThreshold(req, res, 'updateHumidityThreshold')
 }
 
 /**
@@ -335,13 +302,7 @@ const updateHumidityThreshold = async (req, res) => {
  * @returns {Promise<void>}
  */
 const getMoistureThreshold = async (req, res, next) => {
-  try {
-    const result = await SensorService.getMoistureThreshold(req.user.id)
-    res.threshold = { upper: result.upper, lower: result.lower }
-    next()
-  } catch (error) {
-    res.status(error.statusCode).json({ error: error.message })
-  }
+  await loadThreshold(req, res, next, 'getMoistureThreshold')
 }
 
 /**
@@ -352,24 +313,7 @@ const getMoistureThreshold = async (req, res, next) => {
  * @returns {Promise<void>}
  */
 const updateMoistureThreshold = async (req, res) => {
-  try {
-    let { upper, lower } = req.query
-    if (CommonUtils.checkNullOrUndefined(upper)) {
-      throw new BadRequestError('Upper threshold is empty')
-    }
-    if (CommonUtils.checkNullOrUndefined(lower)) {
-      throw new BadRequestError('Lower threshold is empty')
-    }
-    upper = Number(upper)
-    lower = Number(lower)
-    if (upper < lower) {
-      throw new BadRequestError('Invalid Threshold')
-    }
-    await SensorService.updateMoistureThreshold(req.user.id, upper, lower)
-    res.status(200).json({ message: 'Threshold updated' })
-  } catch (error) {
-    res.status(error.statusCode).json({ error: error.message })
-  }
+  await updateThreshold(req, res, 'updateMoistureThreshold')
 }
 
 export const SensorController = {

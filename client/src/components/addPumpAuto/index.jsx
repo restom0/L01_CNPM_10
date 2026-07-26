@@ -98,7 +98,7 @@ export default function AddPumpAuto(props) {
                             <input className='rounded-full' type="time" value={endTime} onChange={handleEndTimeChange} />
                         </div>
                         <div className='float-right'>
-                            <button className={classes.scheduleButton} onClick={handleSubmit}>{t('common.ok')}</button>
+                            <button type="button" className={classes.scheduleButton} onClick={handleSubmit}>{t('common.ok')}</button>
                         </div>
                         <div className='clear-both'></div>
                     </div>

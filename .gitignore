@@ -64,6 +64,11 @@ web_modules/
 # Optional REPL history
 .node_repl_history
 
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
 # Output of 'npm pack'
 *.tgz
 
@@ -128,6 +133,7 @@ dist
 .pnp.*
 
 # Editors / IDEs
+.claude/
 .vscode/
 !.vscode/extensions.json
 .idea/
