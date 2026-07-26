@@ -219,7 +219,7 @@ export function getLatestMoisture(sessionID) {
 export function calculateEnvironmentDryness(sessionID) {
   return withDemo(
     sessionID,
-    { data: DUMMY_CHART_SERIES.ed[DUMMY_CHART_SERIES.ed.length - 1] },
+    { data: DUMMY_CHART_SERIES.ed.at(-1) },
     () => axios.get(`${API_BASE_URL}/sensors/ed`, authConfig(sessionID))
   );
 }

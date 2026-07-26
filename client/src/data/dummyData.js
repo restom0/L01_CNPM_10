@@ -1,14 +1,12 @@
 import {
-  DEMO_ADMIN,
   DEMO_RAW_LOGS,
   DEMO_RAW_PUMP_EVENTS,
-  DEMO_RAW_PUMP_TIMERS,
   DEMO_RAW_SENSOR_READINGS,
   DEMO_SENSOR_THRESHOLDS,
 } from "./demoRawData";
 
 function latest(series) {
-  return series[series.length - 1];
+  return series.at(-1);
 }
 
 function toSensorResponse(reading, thresholds) {
@@ -42,12 +40,15 @@ export const DUMMY_CHART_SERIES = {
   moisture: toChartRows(DEMO_RAW_SENSOR_READINGS.moisture),
 };
 
-export const DUMMY_LOGS = DEMO_RAW_LOGS.map(({ activity, Date }) => ({ activity, Date }));
+export const DUMMY_LOGS = DEMO_RAW_LOGS.map(({ activity, Date: createdAt }) => ({
+  activity,
+  Date: createdAt,
+}));
 
-export const DUMMY_PUMP_AUTOS = DEMO_RAW_PUMP_TIMERS;
+export { DEMO_RAW_PUMP_TIMERS as DUMMY_PUMP_AUTOS } from "./demoRawData";
 
 export const DUMMY_PUMP_RESPONSE = latest(DEMO_RAW_PUMP_EVENTS);
 
 export const DUMMY_PUMP_STATE = DUMMY_PUMP_RESPONSE.value;
 
-export { DEMO_ADMIN as DUMMY_ADMIN };
+export { DEMO_ADMIN as DUMMY_ADMIN } from "./demoRawData";
